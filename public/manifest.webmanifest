@@ -1,0 +1,42 @@
+{
+  "name": "Noor Quran: Learn & Complete Quran",
+  "short_name": "Noor Quran",
+  "description": "Learn Quran from Arabic basics and Tajweed to complete Quran recitation with English translation, transliteration, and audio.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#064e3b",
+  "theme_color": "#047857",
+  "orientation": "portrait",
+  "categories": ["education", "books", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Start Learning",
+      "url": "/?tab=learn",
+      "description": "Continue your Quran learning lessons"
+    },
+    {
+      "name": "Read Full Quran",
+      "url": "/?tab=quran",
+      "description": "Open Quran reader with translation and audio"
+    },
+    {
+      "name": "Tajweed Masterclass",
+      "url": "/?tab=tajweed",
+      "description": "Practice Tajweed pronunciation rules"
+    }
+  ]
+}
