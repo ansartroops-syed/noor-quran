@@ -1,7 +1,7 @@
 {
-  "name": "Noor Quran by NajAns",
-  "short_name": "Noor Quran by NajAns",
-  "description": "Noor Quran by NajAns — learn Quran from Arabic basics, Noorani Qaida and Tajweed to complete Quran recitation with English translation, transliteration, and audio.",
+  "name": "Noor Quran - Author NajAns",
+  "short_name": "Noor Quran - Author NajAns",
+  "description": "Noor Quran - Author NajAns — learn Quran from Arabic basics, Noorani Qaida and Tajweed to complete Quran recitation with English translation, transliteration, and audio.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#064e3b",

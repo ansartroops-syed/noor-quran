@@ -57,7 +57,7 @@ export function TajweedMasterclassTab({
       {/* Color Code Legend Card */}
       <div className="p-5 rounded-2xl bg-[#06241c] border border-emerald-500/30 space-y-3">
         <h3 className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-          <Info className="w-4 h-4" /> Noor Quran by NajAns Color Code Legend
+          <Info className="w-4 h-4" /> Noor Quran - Author NajAns Color Code Legend
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 text-xs">
           <div className="p-2.5 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-center">

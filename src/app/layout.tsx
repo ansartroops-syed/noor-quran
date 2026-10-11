@@ -3,13 +3,13 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Noor Quran by NajAns",
-  description: "Noor Quran by NajAns — learn Quran from Arabic basics, Noorani Qaida and Tajweed to the complete Quran with English translation, transliteration, and audio.",
+  title: "Noor Quran - Author NajAns",
+  description: "Noor Quran - Author NajAns — learn Quran from Arabic basics, Noorani Qaida and Tajweed to the complete Quran with English translation, transliteration, and audio.",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Noor Quran by NajAns",
+    title: "Noor Quran - Author NajAns",
   },
   icons: {
     icon: "/icons/icon.svg",

@@ -74,7 +74,7 @@ export function Navbar({
           <div>
             <div className="flex items-center gap-1.5">
               <span className="font-extrabold text-white text-base sm:text-lg tracking-tight group-hover:text-emerald-300 transition">
-                Noor Quran by NajAns
+                Noor Quran - Author NajAns
               </span>
             </div>
             <p className="text-[10px] text-slate-400 font-medium hidden sm:block">
