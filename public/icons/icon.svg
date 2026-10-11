@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#064e3b" />
+      <stop offset="50%" stop-color="#065f46" />
+      <stop offset="100%" stop-color="#022c22" />
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde047" />
+      <stop offset="50%" stop-color="#eab308" />
+      <stop offset="100%" stop-color="#ca8a04" />
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#34d399" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#064e3b" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background rounded rectangle -->
+  <rect width="512" height="512" rx="110" fill="url(#bg)"/>
+  
+  <!-- Outer glowing ring -->
+  <circle cx="256" cy="256" r="210" fill="none" stroke="url(#gold)" stroke-width="4" stroke-dasharray="16 8" opacity="0.6"/>
+  <circle cx="256" cy="256" r="190" fill="url(#glow)"/>
+
+  <!-- Islamic 8-Point Star Geometry in background -->
+  <g transform="translate(256, 256)" opacity="0.15">
+    <rect x="-140" y="-140" width="280" height="280" fill="none" stroke="#fde047" stroke-width="6"/>
+    <rect x="-140" y="-140" width="280" height="280" fill="none" stroke="#fde047" stroke-width="6" transform="rotate(45)"/>
+  </g>
+
+  <!-- Quran Rehal / Open Book -->
+  <!-- Left Page -->
+  <path d="M 120 330 C 170 300 230 310 256 340 C 256 220 256 160 256 160 C 230 130 170 120 120 150 Z" fill="#ffffff" filter="drop-shadow(0px 8px 16px rgba(0,0,0,0.3))"/>
+  <!-- Right Page -->
+  <path d="M 392 330 C 342 300 282 310 256 340 C 256 220 256 160 256 160 C 282 130 342 120 392 150 Z" fill="#f8fafc" filter="drop-shadow(0px 8px 16px rgba(0,0,0,0.3))"/>
+
+  <!-- Book Spine / Center Glow -->
+  <line x1="256" y1="160" x2="256" y2="340" stroke="#d97706" stroke-width="4"/>
+
+  <!-- Left Lines (representing Arabic text) -->
+  <path d="M 145 180 Q 185 168 235 182" stroke="#047857" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 145 205 Q 185 193 235 207" stroke="#047857" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 145 230 Q 185 218 235 232" stroke="#047857" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 155 255 Q 190 243 235 257" stroke="#eab308" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 155 280 Q 190 268 230 282" stroke="#047857" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Right Lines (representing English Translation / Transliteration) -->
+  <path d="M 277 182 Q 327 168 367 180" stroke="#047857" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 277 207 Q 327 193 367 205" stroke="#047857" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 277 232 Q 327 218 367 230" stroke="#047857" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 277 257 Q 322 243 357 255" stroke="#eab308" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 282 282 Q 322 268 357 280" stroke="#047857" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Wooden Rehal / Stand -->
+  <path d="M 140 340 L 256 420 L 372 340 L 390 360 L 256 450 L 122 360 Z" fill="url(#gold)"/>
+  <path d="M 170 380 L 256 440 L 342 380 L 352 395 L 256 460 L 160 395 Z" fill="#b45309"/>
+
+  <!-- Crescent and Star at Top -->
+  <g transform="translate(256, 95) scale(0.9)">
+    <path d="M 0 -25 A 25 25 0 1 0 25 0 A 20 20 0 1 1 0 -25 Z" fill="url(#gold)" transform="translate(-10, 0)"/>
+    <polygon points="12,-8 15,-1 22,-1 16,3 18,10 12,6 6,10 8,3 2,-1 9,-1" fill="#fde047"/>
+  </g>
+</svg>
