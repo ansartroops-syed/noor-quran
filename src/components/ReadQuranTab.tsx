@@ -3,9 +3,16 @@
 import React, { useEffect, useState } from "react";
 import { BookOpen, ChevronLeft, ChevronRight, Loader2, Type } from "lucide-react";
 import { SURAH_LIST } from "@/data/surahMetadata";
-import { ReadingSurah, splitLeadingBismillah, standardBismillah } from "@/lib/quranReading";
+import { ReadingSurah, splitLeadingBismillah } from "@/lib/quranReading";
+import { QuranScriptPicker } from "@/components/QuranScriptPicker";
+import { resolveQuranScript } from "@/lib/quranScripts";
 
-export function ReadQuranTab() {
+interface ReadQuranTabProps {
+  script: string;
+  onScriptChange: (scriptId: string) => void;
+}
+
+export function ReadQuranTab({ script, onScriptChange }: ReadQuranTabProps) {
   const [surahNumber, setSurahNumber] = useState(1);
   const [surah, setSurah] = useState<ReadingSurah | null>(null);
   const [loading, setLoading] = useState(true);
@@ -20,7 +27,7 @@ export function ReadQuranTab() {
     setLoading(true);
     setError("");
 
-    fetch(`/api/quran/read/${surahNumber}`)
+    fetch(`/api/quran/read/${surahNumber}?script=${encodeURIComponent(script)}`)
       .then(async (response) => {
         const data = await response.json();
         if (!response.ok || !data.success) {
@@ -44,7 +51,7 @@ export function ReadQuranTab() {
     return () => {
       active = false;
     };
-  }, [surahNumber, reloadKey]);
+  }, [surahNumber, reloadKey, script]);
 
   const verseLayout = showTranslation || showTransliteration;
 
@@ -86,7 +93,9 @@ export function ReadQuranTab() {
           </div>
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
+          <div className="mt-4 space-y-3">
+            <QuranScriptPicker value={script} onChange={onScriptChange} />
+          <div className="flex flex-wrap items-center gap-3 text-sm">
           <label className="flex items-center gap-2 rounded-xl border border-emerald-800 px-3 py-2 text-slate-200">
             <input
               type="checkbox"
@@ -117,6 +126,7 @@ export function ReadQuranTab() {
               className="w-full accent-emerald-500"
             />
           </label>
+          </div>
         </div>
       </div>
 
@@ -152,8 +162,8 @@ export function ReadQuranTab() {
 
           {surah.number !== 9 && (
             <div className="mb-8 border-y-2 border-amber-700/30 bg-amber-50/80 px-4 py-6 text-center">
-              <p className="font-scheherazade text-4xl leading-loose text-emerald-950 sm:text-5xl" dir="rtl">
-                {standardBismillah()}
+              <p className={`${resolveQuranScript(script).fontClass} text-4xl leading-loose text-emerald-950 sm:text-5xl`} dir="rtl">
+                {surah.bismillah}
               </p>
               <p className="mt-1 text-sm font-medium text-emerald-800">Bismillah ir-Rahman ir-Rahim</p>
               {surah.number === 1 && <p className="mt-1 text-xs text-stone-500">Verse 1</p>}
@@ -173,7 +183,7 @@ export function ReadQuranTab() {
                 .map((ayah) => (
                 <section key={ayah.number} className="border-b border-amber-900/10 pb-5">
                   <p
-                    className="font-scheherazade text-right leading-[2.2] text-emerald-950"
+                    className={`${resolveQuranScript(script).fontClass} text-right leading-[2.2] text-emerald-950`}
                     style={{ fontSize: `${fontSize}px` }}
                     dir="rtl"
                   >
@@ -193,7 +203,7 @@ export function ReadQuranTab() {
             </div>
           ) : (
             <p
-              className="font-scheherazade text-right leading-[2.35] text-emerald-950"
+              className={`${resolveQuranScript(script).fontClass} text-right leading-[2.35] text-emerald-950`}
               style={{ fontSize: `${fontSize}px` }}
               dir="rtl"
             >

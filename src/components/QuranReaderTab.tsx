@@ -22,7 +22,9 @@ import {
   Loader2,
 } from "lucide-react";
 import { SURAH_LIST, SurahMeta } from "@/data/surahMetadata";
-import { splitLeadingBismillah, standardBismillah } from "@/lib/quranReading";
+import { splitLeadingBismillah } from "@/lib/quranReading";
+import { QuranScriptPicker } from "@/components/QuranScriptPicker";
+import { resolveQuranScript } from "@/lib/quranScripts";
 import { SurahDetail, QuranAyah } from "@/data/surahDetailsData";
 import { UserPreferences } from "@/components/SettingsModal";
 
@@ -38,6 +40,8 @@ interface QuranReaderTabProps {
   onOpenVoiceRecorder: (surahNumber: number, ayahNumber: number, text: string, trans: string, meaning: string) => void;
   onSaveBookmark: (surahNumber: number, ayahNumber: number, surahName: string, arabic: string, translation: string, transliteration: string) => void;
   bookmarkedAyahs?: Record<string, boolean>;
+  script: string;
+  onScriptChange: (scriptId: string) => void;
 }
 
 export function QuranReaderTab({
@@ -52,6 +56,8 @@ export function QuranReaderTab({
   onOpenVoiceRecorder,
   onSaveBookmark,
   bookmarkedAyahs = {},
+  script,
+  onScriptChange,
 }: QuranReaderTabProps) {
   const [selectedSurahNum, setSelectedSurahNum] = useState<number>(currentSurahNumber || 1);
   const [surahData, setSurahData] = useState<SurahDetail | null>(null);
@@ -61,6 +67,8 @@ export function QuranReaderTab({
   const [hifzMode, setHifzMode] = useState<"standard" | "hide_translation" | "hide_transliteration" | "blur_arabic">("standard");
   const [wordByWordView, setWordByWordView] = useState(false);
   const [copiedAyah, setCopiedAyah] = useState<number | null>(null);
+  const [loadError, setLoadError] = useState("");
+  const [bismillahText, setBismillahText] = useState<string | null>(null);
 
   const ayahRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
@@ -76,14 +84,22 @@ export function QuranReaderTab({
     let isMounted = true;
     setLoading(true);
 
-    fetch(`/api/quran/${selectedSurahNum}`)
+    setLoadError("");
+    fetch(`/api/quran/${selectedSurahNum}?script=${encodeURIComponent(script)}`)
       .then((res) => res.json())
       .then((data) => {
-        if (isMounted && data.success && data.surah) {
+        if (!isMounted) return;
+        if (data.success && data.surah) {
           setSurahData(data.surah);
+          setBismillahText(data.surah.bismillah || null);
+        } else {
+          setSurahData(null);
+          setLoadError(data.error || "The official Quran text could not be loaded.");
         }
       })
-      .catch((err) => console.error("Failed to load surah:", err))
+      .catch(() => {
+        if (isMounted) setLoadError("The official Quran text could not be loaded.");
+      })
       .finally(() => {
         if (isMounted) setLoading(false);
       });
@@ -91,7 +107,7 @@ export function QuranReaderTab({
     return () => {
       isMounted = false;
     };
-  }, [selectedSurahNum]);
+  }, [selectedSurahNum, script]);
 
   // Auto-scroll to active ayah
   useEffect(() => {
@@ -183,6 +199,7 @@ export function QuranReaderTab({
             </select>
 
             {/* Play All Surah Button */}
+            <QuranScriptPicker value={script} onChange={onScriptChange} />
             <button
               onClick={() => onSelectSurah(Math.max(1, selectedSurahNum - 1))}
               disabled={selectedSurahNum <= 1}
@@ -247,6 +264,12 @@ export function QuranReaderTab({
       )}
 
       {/* Surah Ayahs List */}
+      {!loading && loadError && (
+        <div className="rounded-2xl border border-rose-500/40 bg-rose-950/40 p-6 text-center text-rose-100">
+          {loadError}
+        </div>
+      )}
+
       {!loading && surahData && (
         <div className="space-y-4">
           {/* Bismillah Header (Except Surah 9) */}
@@ -269,7 +292,7 @@ export function QuranReaderTab({
               }`}
             >
               <p className="font-arabic text-3xl sm:text-4xl text-amber-200 leading-loose" dir="rtl">
-                {standardBismillah()}
+                {bismillahText || resolveQuranScript(script).bismillah}
               </p>
               <p className="text-sm text-emerald-300 mt-1">Bismillah ir-Rahman ir-Rahim</p>
               {selectedSurahNum === 1 && (
@@ -397,7 +420,7 @@ export function QuranReaderTab({
                 {/* Arabic Text Display */}
                 <div className="py-2 text-right">
                   <p
-                    className={`font-arabic text-emerald-100 leading-loose transition select-text ${
+                    className={`${resolveQuranScript(script).fontClass} text-emerald-100 leading-loose transition select-text ${
                       hifzMode === "blur_arabic" ? "blur-sm hover:blur-none" : ""
                     }`}
                     style={{ fontSize: `${preferences.arabicFontSize || 28}px` }}

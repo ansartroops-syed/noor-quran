@@ -436,7 +436,12 @@ export default function HomePage() {
         )}
 
         {activeTab === "qaida" && <NooraniQaidaTab />}
-        {activeTab === "read" && <ReadQuranTab />}
+        {activeTab === "read" && (
+          <ReadQuranTab
+            script={preferences.preferredScript}
+            onScriptChange={(scriptId) => handleUpdatePreferences({ preferredScript: scriptId })}
+          />
+        )}
 
         {/* TAB 2: FULL QURAN READER (114 SURAHS / 30 JUZ) */}
         {activeTab === "quran" && (
@@ -455,6 +460,8 @@ export default function HomePage() {
             onOpenVoiceRecorder={handleOpenVoiceRecorderForAyah}
             onSaveBookmark={handleSaveBookmark}
             bookmarkedAyahs={bookmarkedMap}
+            script={preferences.preferredScript}
+            onScriptChange={(scriptId) => handleUpdatePreferences({ preferredScript: scriptId })}
           />
         )}
 

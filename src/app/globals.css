@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Lateef:wght@400;600;700&family=Scheherazade+New:wght@400;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Lateef:wght@400;600;700&family=Noto+Nastaliq+Urdu:wght@400;700&family=Scheherazade+New:wght@400;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -23,6 +23,15 @@ body {
 
 .font-scheherazade {
   font-family: 'Scheherazade New', serif;
+}
+
+.font-indopak {
+  font-family: "Noto Nastaliq Urdu", "Lateef", serif;
+  line-height: 2.8;
+}
+
+.font-mushaf {
+  font-family: "Scheherazade New", "Amiri", serif;
 }
 
 /* Custom Scrollbar */

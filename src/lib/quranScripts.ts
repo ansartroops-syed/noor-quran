@@ -1,0 +1,64 @@
+export const QURAN_SCRIPTS = [
+  {
+    id: "uthmani",
+    label: "Uthmani",
+    description: "Standard Uthmani vowels",
+    endpoint: "uthmani",
+    field: "text_uthmani",
+    fontClass: "font-scheherazade",
+    bismillah: "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
+  },
+  {
+    id: "mushaf",
+    label: "Mushaf Al-Quran Standard",
+    description: "King Fahd Complex Hafs text",
+    endpoint: "qpc_hafs",
+    field: "text_qpc_hafs",
+    fontClass: "font-mushaf",
+    bismillah: "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ",
+  },
+  {
+    id: "indopak",
+    label: "IndoPak",
+    description: "South Asian script",
+    endpoint: "indopak",
+    field: "text_indopak",
+    fontClass: "font-indopak",
+    bismillah: "بِسۡمِ اللهِ الرَّحۡمٰنِ الرَّحِيۡمِ",
+  },
+  {
+    id: "plain",
+    label: "No diacritics or symbols",
+    description: "Plain Arabic, no vowels or pause marks",
+    endpoint: "uthmani_simple",
+    field: "text_uthmani_simple",
+    fontClass: "font-scheherazade",
+    bismillah: "بسم الله الرحمن الرحيم",
+  },
+] as const;
+
+export type QuranScriptId = (typeof QURAN_SCRIPTS)[number]["id"];
+
+export function resolveQuranScript(value: string | null | undefined) {
+  return QURAN_SCRIPTS.find((script) => script.id === value) ?? QURAN_SCRIPTS[0];
+}
+
+export function cleanVerseText(text: string, scriptId: QuranScriptId): string {
+  let cleaned = text.replace(/^\uFEFF/, "").replace(/\u00a0/g, " ").trim();
+  if (scriptId === "mushaf") {
+    cleaned = cleaned.replace(/[\s\u200b\u200f]*[\u0660-\u0669\u06f0-\u06f9\d]+$/u, "").trim();
+  }
+  return cleaned;
+}
+
+export function stripHtml(text: string): string {
+  return text
+    .replace(/<sup\b[^>]*>[\s\S]*?<\/sup>/gi, "")
+    .replace(/<[^>]*>/g, "")
+    .replace(/&quot;/g, "\"")
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, "&")
+    .replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
