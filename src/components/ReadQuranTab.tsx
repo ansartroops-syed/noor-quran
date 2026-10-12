@@ -1,18 +1,19 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { BookOpen, ChevronLeft, ChevronRight, Loader2, Type } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, Type } from "lucide-react";
 import { SURAH_LIST } from "@/data/surahMetadata";
 import { ReadingSurah, splitLeadingBismillah } from "@/lib/quranReading";
 import { QuranScriptPicker } from "@/components/QuranScriptPicker";
 import { resolveQuranScript } from "@/lib/quranScripts";
 
 interface ReadQuranTabProps {
-  script: string;
-  onScriptChange: (scriptId: string) => void;
+  script?: string;
+  onScriptChange?: (scriptId: string) => void;
 }
 
-export function ReadQuranTab({ script, onScriptChange }: ReadQuranTabProps) {
+export function ReadQuranTab({ script = "uthmani", onScriptChange }: ReadQuranTabProps) {
+  const [activeScript, setActiveScript] = useState(script || "uthmani");
   const [surahNumber, setSurahNumber] = useState(1);
   const [surah, setSurah] = useState<ReadingSurah | null>(null);
   const [loading, setLoading] = useState(true);
@@ -21,13 +22,18 @@ export function ReadQuranTab({ script, onScriptChange }: ReadQuranTabProps) {
   const [showTransliteration, setShowTransliteration] = useState(false);
   const [fontSize, setFontSize] = useState(34);
   const [reloadKey, setReloadKey] = useState(0);
+  const theme = resolveQuranScript(activeScript);
+
+  useEffect(() => {
+    if (script) setActiveScript(script);
+  }, [script]);
 
   useEffect(() => {
     let active = true;
     setLoading(true);
     setError("");
 
-    fetch(`/api/quran/read/${surahNumber}?script=${encodeURIComponent(script)}`)
+    fetch(`/api/quran/read/${surahNumber}?script=${encodeURIComponent(activeScript)}`)
       .then(async (response) => {
         const data = await response.json();
         if (!response.ok || !data.success) {
@@ -51,71 +57,60 @@ export function ReadQuranTab({ script, onScriptChange }: ReadQuranTabProps) {
     return () => {
       active = false;
     };
-  }, [surahNumber, reloadKey, script]);
+  }, [surahNumber, reloadKey, activeScript]);
+
+  const changeScript = (scriptId: string) => {
+    setActiveScript(scriptId);
+    onScriptChange?.(scriptId);
+  };
 
   const verseLayout = showTranslation || showTransliteration;
+  const readingAyahs = (surah?.ayahs || []).filter((ayah) => !(surah?.number === 1 && ayah.number === 1));
 
   return (
-    <div className="space-y-5 pb-24">
-      <div className="rounded-3xl border border-emerald-500/30 bg-[#06241c] p-5 sm:p-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-emerald-400">Official Uthmani text</p>
-            <h1 className="mt-1 text-2xl font-extrabold text-white">Read Quran</h1>
-            <p className="mt-1 text-sm text-slate-400">Arabic reading with optional English translation and transliteration.</p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={() => setSurahNumber((current) => Math.max(1, current - 1))}
-              disabled={surahNumber <= 1}
-              className="rounded-xl border border-emerald-800 px-3 py-2 text-xs font-semibold text-emerald-200 disabled:opacity-40"
-            >
-              <ChevronLeft className="mr-1 inline h-4 w-4" /> Previous
-            </button>
-            <select
-              value={surahNumber}
-              onChange={(event) => setSurahNumber(Number(event.target.value))}
-              className="rounded-xl border border-emerald-800 bg-emerald-950 px-3 py-2 text-sm font-semibold text-white"
-            >
-              {SURAH_LIST.map((item) => (
-                <option key={item.number} value={item.number}>
-                  {item.number}. {item.nameTransliterated} — {item.nameArabic}
-                </option>
-              ))}
-            </select>
-            <button
-              onClick={() => setSurahNumber((current) => Math.min(114, current + 1))}
-              disabled={surahNumber >= 114}
-              className="rounded-xl border border-emerald-800 px-3 py-2 text-xs font-semibold text-emerald-200 disabled:opacity-40"
-            >
-              Next <ChevronRight className="ml-1 inline h-4 w-4" />
-            </button>
-          </div>
+    <div className="space-y-4 rounded-3xl bg-[#f7f1e3] p-3 text-stone-900 sm:p-5">
+      <div className="rounded-2xl border border-stone-300 bg-white p-4 shadow-sm">
+        <h1 className="text-2xl font-extrabold text-stone-950">Read Quran</h1>
+        <p className="mt-1 text-sm text-stone-600">Light reading page. Choose a theme, then read in Arabic.</p>
+        <div className="mt-4">
+          <QuranScriptPicker value={activeScript} onChange={changeScript} />
         </div>
-
-          <div className="mt-4 space-y-3">
-            <QuranScriptPicker value={script} onChange={onScriptChange} />
-          <div className="flex flex-wrap items-center gap-3 text-sm">
-          <label className="flex items-center gap-2 rounded-xl border border-emerald-800 px-3 py-2 text-slate-200">
-            <input
-              type="checkbox"
-              checked={showTranslation}
-              onChange={(event) => setShowTranslation(event.target.checked)}
-              className="h-4 w-4 accent-emerald-500"
-            />
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => setSurahNumber((current) => Math.max(1, current - 1))}
+            disabled={surahNumber <= 1}
+            className="rounded-xl border border-stone-300 bg-white px-3 py-2 text-xs font-semibold text-stone-800 disabled:opacity-40"
+          >
+            <ChevronLeft className="mr-1 inline h-4 w-4" /> Previous
+          </button>
+          <select
+            value={surahNumber}
+            onChange={(event) => setSurahNumber(Number(event.target.value))}
+            className="rounded-xl border border-stone-300 bg-white px-3 py-2 text-sm font-semibold text-stone-900"
+          >
+            {SURAH_LIST.map((item) => (
+              <option key={item.number} value={item.number}>
+                {item.number}. {item.nameTransliterated}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={() => setSurahNumber((current) => Math.min(114, current + 1))}
+            disabled={surahNumber >= 114}
+            className="rounded-xl border border-stone-300 bg-white px-3 py-2 text-xs font-semibold text-stone-800 disabled:opacity-40"
+          >
+            Next <ChevronRight className="ml-1 inline h-4 w-4" />
+          </button>
+          <label className="flex items-center gap-2 rounded-xl border border-stone-300 bg-white px-3 py-2 text-sm text-stone-800">
+            <input type="checkbox" checked={showTranslation} onChange={(event) => setShowTranslation(event.target.checked)} />
             Translation
           </label>
-          <label className="flex items-center gap-2 rounded-xl border border-emerald-800 px-3 py-2 text-slate-200">
-            <input
-              type="checkbox"
-              checked={showTransliteration}
-              onChange={(event) => setShowTransliteration(event.target.checked)}
-              className="h-4 w-4 accent-emerald-500"
-            />
+          <label className="flex items-center gap-2 rounded-xl border border-stone-300 bg-white px-3 py-2 text-sm text-stone-800">
+            <input type="checkbox" checked={showTransliteration} onChange={(event) => setShowTransliteration(event.target.checked)} />
             Transliteration
           </label>
-          <label className="flex min-w-48 flex-1 items-center gap-2 text-xs text-slate-300">
-            <Type className="h-4 w-4 text-emerald-400" />
+          <label className="flex min-w-40 items-center gap-2 text-xs text-stone-700">
+            <Type className="h-4 w-4" />
             <input
               type="range"
               min={24}
@@ -123,26 +118,24 @@ export function ReadQuranTab({ script, onScriptChange }: ReadQuranTabProps) {
               step={2}
               value={fontSize}
               onChange={(event) => setFontSize(Number(event.target.value))}
-              className="w-full accent-emerald-500"
             />
           </label>
-          </div>
         </div>
       </div>
 
       {loading && (
-        <div className="py-20 text-center text-emerald-300">
-          <Loader2 className="mx-auto h-8 w-8 animate-spin" />
-          <p className="mt-3 text-sm">Loading official Quran text...</p>
+        <div className="rounded-2xl bg-white py-16 text-center text-stone-700">
+          <Loader2 className="mx-auto h-8 w-8 animate-spin text-emerald-700" />
+          <p className="mt-3 text-sm">Loading Quran text...</p>
         </div>
       )}
 
       {!loading && error && (
-        <div className="rounded-2xl border border-rose-500/40 bg-rose-950/40 p-6 text-center">
-          <p className="text-rose-200">{error}</p>
+        <div className="rounded-2xl border border-rose-300 bg-white p-6 text-center text-rose-700">
+          <p>{error}</p>
           <button
             onClick={() => setReloadKey((current) => current + 1)}
-            className="mt-4 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white"
+            className="mt-4 rounded-xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white"
           >
             Try again
           </button>
@@ -150,95 +143,49 @@ export function ReadQuranTab({ script, onScriptChange }: ReadQuranTabProps) {
       )}
 
       {!loading && surah && (
-        <article className="rounded-3xl border border-amber-200/30 bg-[#f7f1e3] px-4 py-6 text-[#1c1917] shadow-2xl sm:px-8 sm:py-8">
-          <header className="mb-6 border-b border-amber-900/15 pb-5 text-center">
-            <p className="text-xs font-semibold uppercase tracking-wider text-emerald-800">
-              {surah.revelationType} · {surah.versesCount} verses
-            </p>
-            <h2 className="font-arabic mt-2 text-4xl font-bold text-emerald-950 sm:text-5xl">{surah.nameArabic}</h2>
+        <article className={`rounded-3xl px-4 py-6 sm:px-8 ${theme.themeClass}`}>
+          <header className="mb-6 border-b border-black/10 pb-4 text-center">
+            <h2 className="font-arabic text-4xl font-bold sm:text-5xl">{surah.nameArabic}</h2>
             <p className="mt-1 text-lg font-semibold">Surah {surah.nameTransliterated}</p>
-            <p className="text-sm text-stone-600">{surah.nameEnglish}</p>
+            <p className="text-sm opacity-70">{surah.nameEnglish} · {surah.versesCount} verses</p>
           </header>
 
           {surah.number !== 9 && (
-            <div className="mb-8 border-y-2 border-amber-700/30 bg-amber-50/80 px-4 py-6 text-center">
-              <p className={`${resolveQuranScript(script).fontClass} text-4xl leading-loose text-emerald-950 sm:text-5xl`} dir="rtl">
-                {surah.bismillah}
+            <div className="mb-8 border-y border-black/10 px-3 py-5 text-center">
+              <p className={`${theme.fontClass} text-4xl leading-loose sm:text-5xl`} dir="rtl">
+                {surah.bismillah || theme.bismillah}
               </p>
-              <p className="mt-1 text-sm font-medium text-emerald-800">Bismillah ir-Rahman ir-Rahim</p>
-              {surah.number === 1 && <p className="mt-1 text-xs text-stone-500">Verse 1</p>}
+              <p className="text-sm">Bismillah ir-Rahman ir-Rahim</p>
             </div>
           )}
 
-          {surah.number === 9 && (
-            <p className="mb-6 text-center text-sm text-stone-600">
-              Surah At-Tawbah does not begin with Bismillah.
-            </p>
-          )}
-
           {verseLayout ? (
-            <div className="space-y-6">
-              {surah.ayahs
-                .filter((ayah) => !(surah.number === 1 && ayah.number === 1))
-                .map((ayah) => (
-                <section key={ayah.number} className="border-b border-amber-900/10 pb-5">
-                  <p
-                    className={`${resolveQuranScript(script).fontClass} text-right leading-[2.2] text-emerald-950`}
-                    style={{ fontSize: `${fontSize}px` }}
-                    dir="rtl"
-                  >
+            <div className="space-y-5">
+              {readingAyahs.map((ayah) => (
+                <section key={ayah.number} className="border-b border-black/10 pb-4">
+                  <p className={`${theme.fontClass} text-right leading-[2.2]`} style={{ fontSize }} dir="rtl">
                     {(ayah.number === 1 ? splitLeadingBismillah(ayah.arabic).ayah : ayah.arabic)}{" "}
-                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-amber-700 align-middle text-xs font-bold text-amber-800">
+                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-current align-middle text-[11px]">
                       {ayah.number}
                     </span>
                   </p>
-                  {showTransliteration && ayah.transliteration && (
-                    <p className="mt-2 text-sm italic text-emerald-800">{ayah.transliteration}</p>
-                  )}
-                  {showTranslation && ayah.translation && (
-                    <p className="mt-1 text-base leading-relaxed text-stone-800">{ayah.translation}</p>
-                  )}
+                  {showTransliteration && <p className="mt-2 text-sm italic opacity-80">{ayah.transliteration}</p>}
+                  {showTranslation && <p className="mt-1 text-base leading-relaxed">{ayah.translation}</p>}
                 </section>
               ))}
             </div>
           ) : (
-            <p
-              className={`${resolveQuranScript(script).fontClass} text-right leading-[2.35] text-emerald-950`}
-              style={{ fontSize: `${fontSize}px` }}
-              dir="rtl"
-            >
-              {surah.ayahs
-                .filter((ayah) => !(surah.number === 1 && ayah.number === 1))
-                .map((ayah) => (
+            <p className={`${theme.fontClass} text-right leading-[2.3]`} style={{ fontSize }} dir="rtl">
+              {readingAyahs.map((ayah) => (
                 <span key={ayah.number}>
                   {(ayah.number === 1 ? splitLeadingBismillah(ayah.arabic).ayah : ayah.arabic)}{" "}
-                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-amber-700 align-middle text-[11px] font-bold text-amber-800">
+                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-current align-middle text-[11px]">
                     {ayah.number}
                   </span>{" "}
                 </span>
               ))}
             </p>
           )}
-
-          <footer className="mt-8 flex items-center justify-between text-sm">
-            <button
-              onClick={() => setSurahNumber((current) => Math.max(1, current - 1))}
-              disabled={surah.number <= 1}
-              className="rounded-xl px-3 py-2 font-semibold text-emerald-900 disabled:opacity-40"
-            >
-              Previous surah
-            </button>
-            <span className="inline-flex items-center gap-1 text-stone-500">
-              <BookOpen className="h-4 w-4" /> {surah.number} / 114
-            </span>
-            <button
-              onClick={() => setSurahNumber((current) => Math.min(114, current + 1))}
-              disabled={surah.number >= 114}
-              className="rounded-xl px-3 py-2 font-semibold text-emerald-900 disabled:opacity-40"
-            >
-              Next surah
-            </button>
-          </footer>
         </article>
       )}
     </div>

@@ -34,6 +34,28 @@ body {
   font-family: "Scheherazade New", "Amiri", serif;
 }
 
+.quran-theme-uthmani {
+  background: #f7f1e3;
+  color: #1c1917;
+}
+
+.quran-theme-mushaf {
+  background: #f3f7f2;
+  color: #14261c;
+  border: 2px solid #c4a35a;
+}
+
+.quran-theme-indopak {
+  background: #fff6e8;
+  color: #3b2414;
+}
+
+.quran-theme-plain {
+  background: #ffffff;
+  color: #111827;
+  border: 1px solid #d6d3d1;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

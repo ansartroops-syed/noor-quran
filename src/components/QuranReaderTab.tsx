@@ -138,22 +138,23 @@ export function QuranReaderTab({
   const currentMeta = SURAH_LIST.find((s) => s.number === selectedSurahNum);
 
   return (
-    <div className="space-y-6 pb-24">
+    <div className="space-y-6 rounded-3xl bg-[#f7f1e3] p-3 text-stone-900 sm:p-5">
       {/* Surah Header & Toolbar */}
-      <div className="rounded-3xl border border-emerald-500/30 bg-[#06241c] p-4 sm:p-6 shadow-xl space-y-4">
+      <div className="rounded-3xl border border-stone-300 bg-white p-4 sm:p-6 shadow-sm space-y-4">
+        <QuranScriptPicker value={script} onChange={onScriptChange} />
         {/* Controls row */}
         <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
           {/* Surah Selector Dropdown */}
           <div className="flex-1 max-w-lg relative">
             <div className="flex items-center gap-2">
               <div className="relative flex-1">
-                <Search className="w-4 h-4 text-emerald-400 absolute left-3 top-3.5" />
+                <Search className="w-4 h-4 text-emerald-700 absolute left-3 top-3.5" />
                 <input
                   type="text"
                   placeholder="Select / search 114 Surahs..."
                   value={surahSearchQuery}
                   onChange={(e) => setSurahSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-emerald-950/80 border border-emerald-800 focus:border-emerald-400 focus:outline-none text-white text-xs sm:text-sm"
+                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-white border border-stone-300 focus:border-emerald-700 focus:outline-none text-stone-900 text-xs sm:text-sm"
                 />
               </div>
 
@@ -161,7 +162,7 @@ export function QuranReaderTab({
               <select
                 value={selectedSurahNum}
                 onChange={(e) => setSelectedSurahNum(Number(e.target.value))}
-                className="px-3 py-2.5 rounded-xl bg-emerald-950/80 border border-emerald-800 text-emerald-300 font-bold text-xs sm:text-sm focus:outline-none cursor-pointer"
+                className="px-3 py-2.5 rounded-xl bg-white border border-stone-300 text-stone-900 font-bold text-xs sm:text-sm focus:outline-none cursor-pointer"
               >
                 {filteredSurahs.map((s) => (
                   <option key={s.number} value={s.number} className="bg-[#041a14] text-white">
@@ -179,8 +180,8 @@ export function QuranReaderTab({
               onClick={() => setWordByWordView(!wordByWordView)}
               className={`px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition ${
                 wordByWordView
-                  ? "bg-emerald-600 text-white shadow-sm"
-                  : "bg-emerald-950/60 text-slate-300 hover:text-white border border-emerald-800/60"
+                  ? "bg-emerald-700 text-white shadow-sm"
+                  : "bg-white text-stone-800 hover:bg-stone-100 border border-stone-300"
               }`}
             >
               <Layers className="w-3.5 h-3.5" /> Word-by-Word
@@ -190,7 +191,7 @@ export function QuranReaderTab({
             <select
               value={hifzMode}
               onChange={(e) => setHifzMode(e.target.value as any)}
-              className="px-3 py-2 rounded-xl bg-emerald-950/60 border border-emerald-800/60 text-amber-300 text-xs font-semibold focus:outline-none cursor-pointer"
+              className="px-3 py-2 rounded-xl bg-white border border-stone-300 text-stone-800 text-xs font-semibold focus:outline-none cursor-pointer"
             >
               <option value="standard" className="bg-[#041a14] text-white">👁 Mode: Full View</option>
               <option value="hide_translation" className="bg-[#041a14] text-white">🔒 Hifz: Hide Translation</option>
@@ -199,11 +200,10 @@ export function QuranReaderTab({
             </select>
 
             {/* Play All Surah Button */}
-            <QuranScriptPicker value={script} onChange={onScriptChange} />
             <button
               onClick={() => onSelectSurah(Math.max(1, selectedSurahNum - 1))}
               disabled={selectedSurahNum <= 1}
-              className="px-3 py-2 rounded-xl text-xs font-semibold text-emerald-200 border border-emerald-800 disabled:opacity-40 flex items-center gap-1"
+              className="px-3 py-2 rounded-xl text-xs font-semibold text-stone-800 border border-stone-300 bg-white disabled:opacity-40 flex items-center gap-1"
             >
               <ChevronLeft className="w-3.5 h-3.5" /> Prev Surah
             </button>
@@ -217,7 +217,7 @@ export function QuranReaderTab({
                     surahData.versesCount
                   )
                 }
-                className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 transition shadow-md shadow-emerald-500/20"
+                className="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs flex items-center gap-1.5 transition"
               >
                 <Play className="w-3.5 h-3.5 fill-slate-950" /> Play Surah
               </button>
@@ -225,7 +225,7 @@ export function QuranReaderTab({
             <button
               onClick={() => onSelectSurah(Math.min(114, selectedSurahNum + 1))}
               disabled={selectedSurahNum >= 114}
-              className="px-3 py-2 rounded-xl text-xs font-semibold text-emerald-200 border border-emerald-800 disabled:opacity-40 flex items-center gap-1"
+              className="px-3 py-2 rounded-xl text-xs font-semibold text-stone-800 border border-stone-300 bg-white disabled:opacity-40 flex items-center gap-1"
             >
               Next Surah <ChevronRight className="w-3.5 h-3.5" />
             </button>
@@ -234,23 +234,23 @@ export function QuranReaderTab({
 
         {/* Selected Surah Banner Card */}
         {currentMeta && (
-          <div className="p-6 rounded-2xl bg-gradient-to-r from-[#052e22] via-[#04241b] to-[#021812] border border-emerald-500/30 text-center space-y-2 relative overflow-hidden">
-            <div className="flex items-center justify-between text-xs text-slate-400">
-              <span className="font-semibold text-emerald-400">
+          <div className="p-6 rounded-2xl bg-[#fffaf0] border border-stone-200 text-center space-y-2">
+            <div className="flex items-center justify-between text-xs text-stone-500">
+              <span className="font-semibold text-emerald-800">
                 Juz {currentMeta.juzNumber} • Page {currentMeta.pageNumber}
               </span>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-900/60 text-emerald-300 border border-emerald-700/50">
+              <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
                 {currentMeta.revelationType} • {currentMeta.versesCount} Ayahs
               </span>
             </div>
 
-            <h2 className="font-arabic text-4xl sm:text-5xl text-amber-300 font-bold py-1">
+            <h2 className="font-arabic text-4xl sm:text-5xl text-emerald-950 font-bold py-1">
               {currentMeta.nameArabic}
             </h2>
-            <h3 className="text-xl sm:text-2xl font-bold text-white tracking-wide">
+            <h3 className="text-xl sm:text-2xl font-bold text-stone-900 tracking-wide">
               Surah {currentMeta.nameTransliterated}
             </h3>
-            <p className="text-xs sm:text-sm text-slate-300 italic">{currentMeta.nameEnglish}</p>
+            <p className="text-xs sm:text-sm text-stone-600 italic">{currentMeta.nameEnglish}</p>
           </div>
         )}
       </div>
@@ -271,7 +271,7 @@ export function QuranReaderTab({
       )}
 
       {!loading && surahData && (
-        <div className="space-y-4">
+        <div className={`space-y-4 rounded-3xl p-4 sm:p-6 ${resolveQuranScript(script).themeClass}`}>
           {/* Bismillah Header (Except Surah 9) */}
           {selectedSurahNum !== 9 && (
             <button
@@ -287,21 +287,21 @@ export function QuranReaderTab({
                 isPlayingAudio &&
                 playingSurahNumber === selectedSurahNum &&
                 playingAyahNumber === (selectedSurahNum === 1 ? 1 : 0)
-                  ? "bg-[#063327] border-amber-400 ring-2 ring-amber-400/30"
-                  : "bg-[#041a14] border-amber-500/40"
+                  ? "bg-amber-100 border-amber-500"
+                  : "bg-white border-amber-300"
               }`}
             >
-              <p className="font-arabic text-3xl sm:text-4xl text-amber-200 leading-loose" dir="rtl">
+              <p className={`${resolveQuranScript(script).fontClass} text-3xl sm:text-4xl text-stone-950 leading-loose`} dir="rtl">
                 {bismillahText || resolveQuranScript(script).bismillah}
               </p>
-              <p className="text-sm text-emerald-300 mt-1">Bismillah ir-Rahman ir-Rahim</p>
+              <p className="text-sm text-stone-700 mt-1">Bismillah ir-Rahman ir-Rahim</p>
               {selectedSurahNum === 1 && (
                 <p className="text-xs text-slate-400 mt-1">Al-Fatiha, verse 1</p>
               )}
             </button>
           )}
           {selectedSurahNum === 9 && (
-            <div className="py-3 text-center rounded-2xl bg-[#041a14]/60 border border-emerald-900/50 text-xs text-slate-400">
+            <div className="py-3 text-center rounded-2xl bg-white border border-stone-200 text-xs text-stone-600">
               Surah At-Tawbah does not begin with Bismillah.
             </div>
           )}
@@ -322,21 +322,21 @@ export function QuranReaderTab({
                 ref={(el) => {
                   ayahRefs.current[ayah.ayahNumber] = el;
                 }}
-                className={`p-5 sm:p-6 rounded-3xl border transition-all duration-300 space-y-4 ${
+                className={`p-5 sm:p-6 rounded-3xl border transition-all duration-300 space-y-4 text-stone-900 ${
                   isPlayingThis
-                    ? "bg-[#063327] border-amber-400 ring-2 ring-amber-400/30 shadow-2xl"
+                    ? "bg-amber-50 border-amber-400 ring-2 ring-amber-300 shadow-md"
                     : isHighlighted
-                    ? "bg-[#062c22] border-emerald-400 shadow-xl"
-                    : "bg-[#06241c] border-emerald-900/60 hover:border-emerald-700/80"
+                    ? "bg-emerald-50 border-emerald-400 shadow-sm"
+                    : "bg-white border-stone-200 hover:border-emerald-400"
                 }`}
               >
                 {/* Ayah Top Bar (Number + Toolbar) */}
-                <div className="flex items-center justify-between pb-3 border-b border-emerald-900/60 text-xs text-slate-400">
+                <div className="flex items-center justify-between pb-3 border-b border-stone-200 text-xs text-stone-500">
                   <div className="flex items-center gap-2">
                     <span className="w-7 h-7 rounded-lg bg-emerald-900/80 border border-emerald-700/50 flex items-center justify-center font-bold text-emerald-300 text-xs">
                       {ayah.ayahNumber}
                     </span>
-                    <span className="font-semibold text-slate-300">
+                    <span className="font-semibold text-stone-700">
                       {selectedSurahNum}:{ayah.ayahNumber}
                     </span>
                   </div>
@@ -356,7 +356,7 @@ export function QuranReaderTab({
                       className={`p-1.5 rounded-lg transition ${
                         isPlayingThis
                           ? "bg-amber-500 text-slate-950 font-bold"
-                          : "bg-emerald-950 text-emerald-300 hover:bg-emerald-900"
+                          : "bg-emerald-50 text-emerald-800 hover:bg-emerald-100"
                       }`}
                       title="Play Ayah recitation"
                     >
@@ -395,7 +395,7 @@ export function QuranReaderTab({
                       className={`p-1.5 rounded-lg transition ${
                         isBookmarked
                           ? "bg-amber-500 text-slate-950 font-bold"
-                          : "bg-emerald-950 text-slate-400 hover:text-white hover:bg-emerald-900"
+                          : "bg-stone-100 text-stone-600 hover:text-stone-900"
                       }`}
                       title={isBookmarked ? "Ayah Saved" : "Bookmark Ayah"}
                     >
@@ -405,7 +405,7 @@ export function QuranReaderTab({
                     {/* Copy Text */}
                     <button
                       onClick={() => handleCopyAyah(ayah)}
-                      className="p-1.5 rounded-lg bg-emerald-950 text-slate-400 hover:text-white hover:bg-emerald-900 transition"
+                      className="p-1.5 rounded-lg bg-stone-100 text-stone-600 hover:text-stone-900 hover:bg-stone-200 transition"
                       title="Copy Arabic & Translation"
                     >
                       {copiedAyah === ayah.ayahNumber ? (
@@ -420,7 +420,7 @@ export function QuranReaderTab({
                 {/* Arabic Text Display */}
                 <div className="py-2 text-right">
                   <p
-                    className={`${resolveQuranScript(script).fontClass} text-emerald-100 leading-loose transition select-text ${
+                    className={`${resolveQuranScript(script).fontClass} text-stone-950 leading-loose transition select-text ${
                       hifzMode === "blur_arabic" ? "blur-sm hover:blur-none" : ""
                     }`}
                     style={{ fontSize: `${preferences.arabicFontSize || 28}px` }}
@@ -438,11 +438,11 @@ export function QuranReaderTab({
                       {ayah.words.map((w, wIdx) => (
                         <div
                           key={wIdx}
-                          className="p-2.5 rounded-xl bg-[#041a14] border border-emerald-900/80 text-center space-y-1 min-w-[80px]"
+                          className="p-2.5 rounded-xl bg-stone-50 border border-stone-200 text-center space-y-1 min-w-[80px]"
                         >
                           <div className="font-arabic text-xl font-bold text-amber-300">{w.arabic}</div>
                           <div className="text-[10px] text-emerald-300 font-medium">{w.transliteration}</div>
-                          <div className="text-[11px] text-slate-300 font-semibold">{w.translation}</div>
+                          <div className="text-[11px] text-stone-700 font-semibold">{w.translation}</div>
                           {w.tajweedRule && (
                             <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-900/60 text-emerald-300 font-bold block">
                               {w.tajweedRule}
@@ -456,21 +456,21 @@ export function QuranReaderTab({
 
                 {/* Transliteration */}
                 {preferences.showTransliteration && hifzMode !== "hide_transliteration" && (
-                  <div className="text-xs sm:text-sm font-medium text-emerald-400/90 italic tracking-wide">
+                  <div className="text-xs sm:text-sm font-medium text-emerald-800 italic tracking-wide">
                     {ayah.transliteration}
                   </div>
                 )}
 
                 {/* English Translation */}
                 {preferences.showTranslation && hifzMode !== "hide_translation" && (
-                  <div className="text-sm sm:text-base text-slate-200 leading-relaxed font-sans">
+                  <div className="text-sm sm:text-base text-stone-800 leading-relaxed font-sans">
                     {ayah.translationSaheeh}
                   </div>
                 )}
 
                 {/* Tafseer reflection note if available */}
                 {ayah.tafseerNote && (
-                  <div className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-800/40 text-xs text-slate-300 flex items-start gap-2">
+                  <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-stone-700 flex items-start gap-2">
                     <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
                     <div>
                       <span className="font-bold text-amber-300">Reflection: </span>

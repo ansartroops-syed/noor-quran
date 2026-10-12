@@ -6,6 +6,7 @@ export const QURAN_SCRIPTS = [
     endpoint: "uthmani",
     field: "text_uthmani",
     fontClass: "font-scheherazade",
+    themeClass: "quran-theme-uthmani",
     bismillah: "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
   },
   {
@@ -15,6 +16,7 @@ export const QURAN_SCRIPTS = [
     endpoint: "qpc_hafs",
     field: "text_qpc_hafs",
     fontClass: "font-mushaf",
+    themeClass: "quran-theme-mushaf",
     bismillah: "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ",
   },
   {
@@ -24,6 +26,7 @@ export const QURAN_SCRIPTS = [
     endpoint: "indopak",
     field: "text_indopak",
     fontClass: "font-indopak",
+    themeClass: "quran-theme-indopak",
     bismillah: "بِسۡمِ اللهِ الرَّحۡمٰنِ الرَّحِيۡمِ",
   },
   {
@@ -33,6 +36,7 @@ export const QURAN_SCRIPTS = [
     endpoint: "uthmani_simple",
     field: "text_uthmani_simple",
     fontClass: "font-scheherazade",
+    themeClass: "quran-theme-plain",
     bismillah: "بسم الله الرحمن الرحيم",
   },
 ] as const;
