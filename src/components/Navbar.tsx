@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import {
   BookOpen,
   BookOpenText,
+  ScrollText,
   GraduationCap,
   Sparkles,
   Layers,
@@ -16,7 +17,7 @@ import {
 } from "lucide-react";
 import { testQuranAudio, playHarmonicChime } from "@/lib/audioEngine";
 
-export type AppTab = "learn" | "qaida" | "quran" | "tajweed" | "vocab" | "bookmarks" | "android_hub";
+export type AppTab = "learn" | "qaida" | "quran" | "read" | "tajweed" | "vocab" | "bookmarks" | "android_hub";
 
 interface NavbarProps {
   activeTab: AppTab;
@@ -45,6 +46,7 @@ export function Navbar({
     { id: "learn", label: "Learn Quran", icon: GraduationCap, badge: "Levels 1-6" },
     { id: "qaida", label: "Noorani Qaida", icon: BookOpenText, badge: "Basics" },
     { id: "quran", label: "Full Quran", icon: BookOpen, badge: "114 Surahs" },
+    { id: "read", label: "Read Quran", icon: ScrollText, badge: "Arabic" },
     { id: "tajweed", label: "Tajweed Guide", icon: Sparkles },
     { id: "vocab", label: "Vocabulary", icon: Layers, badge: "Top 100" },
     { id: "bookmarks", label: "My Goals & Notes", icon: Bookmark },
@@ -74,7 +76,7 @@ export function Navbar({
           <div>
             <div className="flex items-center gap-1.5">
               <span className="font-extrabold text-white text-base sm:text-lg tracking-tight group-hover:text-emerald-300 transition">
-                Noor Quran - Author NajAns
+                Noor Quran by NajAns
               </span>
             </div>
             <p className="text-[10px] text-slate-400 font-medium hidden sm:block">

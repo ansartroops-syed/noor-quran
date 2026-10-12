@@ -22,6 +22,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { SURAH_LIST, SurahMeta } from "@/data/surahMetadata";
+import { splitLeadingBismillah, standardBismillah } from "@/lib/quranReading";
 import { SurahDetail, QuranAyah } from "@/data/surahDetailsData";
 import { UserPreferences } from "@/components/SettingsModal";
 
@@ -249,23 +250,31 @@ export function QuranReaderTab({
       {!loading && surahData && (
         <div className="space-y-4">
           {/* Bismillah Header (Except Surah 9) */}
-          {currentMeta?.bismillahPre && (
+          {selectedSurahNum !== 9 && (
             <button
               onClick={() =>
-                onPlayAyah(selectedSurahNum, 0, surahData.nameTransliterated, surahData.versesCount)
+                onPlayAyah(
+                  selectedSurahNum,
+                  selectedSurahNum === 1 ? 1 : 0,
+                  surahData.nameTransliterated,
+                  surahData.versesCount
+                )
               }
-              className={`w-full py-4 text-center rounded-2xl border ${
-                isPlayingAudio && playingSurahNumber === selectedSurahNum && playingAyahNumber === 0
+              className={`w-full py-6 text-center rounded-2xl border-2 ${
+                isPlayingAudio &&
+                playingSurahNumber === selectedSurahNum &&
+                playingAyahNumber === (selectedSurahNum === 1 ? 1 : 0)
                   ? "bg-[#063327] border-amber-400 ring-2 ring-amber-400/30"
-                  : "bg-[#041a14]/60 border-emerald-900/50"
+                  : "bg-[#041a14] border-amber-500/40"
               }`}
             >
-              <p className="font-arabic text-2xl sm:text-3xl text-emerald-300" dir="rtl">
-                بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+              <p className="font-arabic text-3xl sm:text-4xl text-amber-200 leading-loose" dir="rtl">
+                {standardBismillah()}
               </p>
-              <p className="text-xs text-slate-400 mt-1">
-                Bismillah ir-Rahman ir-Rahim — played before this surah
-              </p>
+              <p className="text-sm text-emerald-300 mt-1">Bismillah ir-Rahman ir-Rahim</p>
+              {selectedSurahNum === 1 && (
+                <p className="text-xs text-slate-400 mt-1">Al-Fatiha, verse 1</p>
+              )}
             </button>
           )}
           {selectedSurahNum === 9 && (
@@ -274,7 +283,11 @@ export function QuranReaderTab({
             </div>
           )}
 
-          {surahData.ayahs.map((ayah) => {
+          {surahData.ayahs.filter((ayah) => !(selectedSurahNum === 1 && ayah.ayahNumber === 1)).map((ayah) => {
+            const arabicText =
+              selectedSurahNum !== 9 && ayah.ayahNumber === 1
+                ? splitLeadingBismillah(ayah.arabicUthmani).ayah
+                : ayah.arabicUthmani.replace(/^\uFEFF/, "").trim();
             const isPlayingThis = isPlayingAudio && playingAyahNumber === ayah.ayahNumber;
             const isHighlighted = highlightAyahNumber === ayah.ayahNumber;
             const bookmarkKey = `${selectedSurahNum}:${ayah.ayahNumber}`;
@@ -390,7 +403,7 @@ export function QuranReaderTab({
                     style={{ fontSize: `${preferences.arabicFontSize || 28}px` }}
                     dir="rtl"
                   >
-                    {ayah.arabicUthmani}{" "}
+                    {arabicText}{" "}
                     <span className="ayah-symbol font-sans">{ayah.ayahNumber}</span>
                   </p>
                 </div>

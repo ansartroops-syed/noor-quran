@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { EMBEDDED_SURAHS, SurahDetail, QuranAyah } from "@/data/surahDetailsData";
 import { SURAH_LIST } from "@/data/surahMetadata";
+import { splitLeadingBismillah } from "@/lib/quranReading";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ surah: string }> }) {
   try {
@@ -41,7 +42,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ sura
           const transEdition = json.data[2] || json.data[1];
 
           const ayahs: QuranAyah[] = uthmaniEdition.ayahs.map((ayahObj: { numberInSurah: number; text: string }, index: number) => {
-            const rawArabic = ayahObj.text;
+            const split = meta?.bismillahPre && ayahObj.numberInSurah === 1
+              ? splitLeadingBismillah(ayahObj.text)
+              : { bismillah: null, ayah: ayahObj.text.replace(/^\uFEFF/, "").trim() };
+            const rawArabic = split.ayah;
             const translation = sahihEdition.ayahs[index]?.text || "";
             const transliteration = transEdition.ayahs[index]?.text || "";
 

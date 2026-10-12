@@ -109,7 +109,7 @@ export function SearchModal({
           {!query && (
             <div className="py-8 text-center text-slate-400 space-y-2">
               <BookOpen className="w-10 h-10 mx-auto text-emerald-500/40" />
-              <p className="text-slate-300 font-medium">Quick Search across Noor Quran - Author NajAns</p>
+              <p className="text-slate-300 font-medium">Quick Search across Noor Quran by NajAns</p>
               <p className="text-xs text-slate-400">
                 Type any Arabic word, English translation keyword, Surah name (e.g. &ldquo;Ikhlas&rdquo;), or Tajweed rule (e.g. &ldquo;Qalqalah&rdquo;).
               </p>
