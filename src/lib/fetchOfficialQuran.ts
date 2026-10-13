@@ -21,6 +21,25 @@ export interface OfficialSurahText {
   ayahs: OfficialAyah[];
 }
 
+type PrintedVerse = { chapter: number; verse: number; text: string };
+
+let printedQuranCache: Promise<PrintedVerse[]> | null = null;
+
+function loadPrintedQuran(): Promise<PrintedVerse[]> {
+  if (!printedQuranCache) {
+    printedQuranCache = readJson(
+      "https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/editions/ara-quranindopak.json"
+    ).then((data) => {
+      const verses = data?.quran;
+      if (!Array.isArray(verses) || verses.length !== 6236) {
+        throw new Error("The printed Quran text was incomplete.");
+      }
+      return verses as PrintedVerse[];
+    });
+  }
+  return printedQuranCache;
+}
+
 async function readJson(url: string) {
   const response = await fetch(url, {
     headers: {
@@ -42,13 +61,23 @@ export async function fetchOfficialSurah(surahNumber: number, requestedScript?: 
   }
 
   const script = resolveQuranScript(requestedScript);
-  const [arabicJson, translationJson, transliterationJson] = await Promise.all([
-    readJson(`https://api.quran.com/api/v4/quran/verses/${script.endpoint}?chapter_number=${surahNumber}`),
+  const [printedQuran, translationJson, transliterationJson] = await Promise.all([
+    script.id === "standard" ? loadPrintedQuran() : Promise.resolve(null),
     readJson(`https://api.quran.com/api/v4/quran/translations/20?chapter_number=${surahNumber}`),
     readJson(`https://api.quran.com/api/v4/quran/translations/57?chapter_number=${surahNumber}`),
   ]);
 
-  const arabicVerses = Array.isArray(arabicJson.verses) ? arabicJson.verses : [];
+  const arabicJson = script.id === "standard"
+    ? null
+    : await readJson(`https://api.quran.com/api/v4/quran/verses/${script.endpoint}?chapter_number=${surahNumber}`);
+
+  const arabicVerses = script.id === "standard"
+    ? (printedQuran || [])
+        .filter((verse) => verse.chapter === surahNumber)
+        .map((verse) => ({ verse_key: `${verse.chapter}:${verse.verse}`, text_standard: verse.text }))
+    : Array.isArray(arabicJson?.verses)
+      ? arabicJson.verses
+      : [];
   const translations = Array.isArray(translationJson.translations) ? translationJson.translations : [];
   const transliterations = Array.isArray(transliterationJson.translations) ? transliterationJson.translations : [];
 

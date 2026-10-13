@@ -27,7 +27,7 @@ export default function HomePage() {
   const [preferences, setPreferences] = useState<UserPreferences>({
     name: "Seeker of Knowledge",
     preferredReciter: "Alafasy_128kbps",
-    preferredScript: "uthmani",
+    preferredScript: "standard",
     preferredTranslation: "saheeh",
     arabicFontSize: 28,
     showTransliteration: true,
@@ -132,7 +132,7 @@ export default function HomePage() {
             ...prev,
             name: p.name || prev.name,
             preferredReciter: p.preferredReciter || prev.preferredReciter,
-            preferredScript: p.preferredScript || prev.preferredScript,
+            preferredScript: !p.preferredScript || p.preferredScript === "uthmani" || p.preferredScript === "mushaf" ? "standard" : p.preferredScript,
             preferredTranslation: p.preferredTranslation || prev.preferredTranslation,
             arabicFontSize: p.arabicFontSize || prev.arabicFontSize,
             showTransliteration: p.showTransliteration ?? prev.showTransliteration,

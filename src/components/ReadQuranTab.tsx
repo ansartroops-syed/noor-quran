@@ -12,8 +12,8 @@ interface ReadQuranTabProps {
   onScriptChange?: (scriptId: string) => void;
 }
 
-export function ReadQuranTab({ script = "uthmani", onScriptChange }: ReadQuranTabProps) {
-  const [activeScript, setActiveScript] = useState(script || "uthmani");
+export function ReadQuranTab({ script = "standard", onScriptChange }: ReadQuranTabProps) {
+  const [activeScript, setActiveScript] = useState(script && script !== "uthmani" && script !== "mushaf" ? script : "standard");
   const [surahNumber, setSurahNumber] = useState(1);
   const [surah, setSurah] = useState<ReadingSurah | null>(null);
   const [loading, setLoading] = useState(true);

@@ -44,7 +44,7 @@ export function Navbar({
 
   const tabs = [
     { id: "learn", label: "Learn Quran", icon: GraduationCap, badge: "Levels 1-6" },
-    { id: "qaida", label: "Noorani Qaida", icon: BookOpenText, badge: "Basics" },
+    { id: "qaida", label: "Noorani Qaida", icon: BookOpenText, badge: "18 Lessons" },
     { id: "quran", label: "Full Quran", icon: BookOpen, badge: "114 Surahs" },
     { id: "read", label: "Read Quran", icon: ScrollText, badge: "Arabic" },
     { id: "tajweed", label: "Tajweed Guide", icon: Sparkles },

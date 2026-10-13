@@ -1,239 +1,109 @@
 "use client";
 
 import React, { useState } from "react";
-import { BookOpenText, Volume2, Loader2, Sparkles, Eye } from "lucide-react";
-import { QAIDA_LETTERS, QaidaLetter } from "@/data/qaidaLetters";
-import { HARAKAT_LESSONS, HarakatLesson } from "@/data/harakatData";
+import { ChevronLeft, ChevronRight, Volume2 } from "lucide-react";
+import { NOORANI_LESSONS, NooraniLesson, QaidaCard } from "@/data/nooraniQaidaLessons";
 import { playLetterPronunciation } from "@/lib/audioEngine";
 
-const JOINING_WORDS = [
-  { word: "بِسْمِ", transliteration: "Bismi", meaning: "In the name" },
-  { word: "اللَّهِ", transliteration: "Allahi", meaning: "of Allah" },
-  { word: "الرَّحْمَٰنِ", transliteration: "Ar-Rahman", meaning: "the Most Gracious" },
-  { word: "الرَّحِيمِ", transliteration: "Ar-Raheem", meaning: "the Most Merciful" },
-  { word: "الْحَمْدُ", transliteration: "Al-hamdu", meaning: "All praise" },
-  { word: "رَبِّ", transliteration: "Rabbi", meaning: "Lord" },
-  { word: "قُلْ", transliteration: "Qul", meaning: "Say" },
-  { word: "هُوَ", transliteration: "Huwa", meaning: "He" },
-  { word: "أَحَدٌ", transliteration: "Ahad", meaning: "One" },
-  { word: "نُور", transliteration: "Noor", meaning: "Light" },
-  { word: "كِتَاب", transliteration: "Kitab", meaning: "Book" },
-  { word: "قُرْآن", transliteration: "Qur'an", meaning: "Quran" },
-];
-
-type QaidaSection = "letters" | "forms" | "harakat" | "joining";
-
 export function NooraniQaidaTab() {
-  const [section, setSection] = useState<QaidaSection>("letters");
-  const [selectedLetter, setSelectedLetter] = useState<QaidaLetter>(QAIDA_LETTERS[0]);
-  const [formMode, setFormMode] = useState<"isolated" | "initial" | "medial" | "final">("isolated");
-  const [selectedHarakat, setSelectedHarakat] = useState<HarakatLesson>(HARAKAT_LESSONS[0]);
-  const [isPlayingAll, setIsPlayingAll] = useState(false);
+  const [lessonIndex, setLessonIndex] = useState(0);
+  const [playingAll, setPlayingAll] = useState(false);
+  const lesson = NOORANI_LESSONS[lessonIndex];
 
-  const playAllLetters = async () => {
-    if (isPlayingAll) return;
-    setIsPlayingAll(true);
-    for (const letter of QAIDA_LETTERS) {
-      setSelectedLetter(letter);
-      await playLetterPronunciation(letter.id, letter.letter);
-      await new Promise((resolve) => setTimeout(resolve, 700));
+  const playCard = (card: QaidaCard) => {
+    playLetterPronunciation(card.transliteration, card.arabic);
+  };
+
+  const playLesson = async (current: NooraniLesson) => {
+    if (playingAll) return;
+    setPlayingAll(true);
+    for (const group of current.groups) {
+      for (const card of group.items) {
+        await playLetterPronunciation(card.transliteration, card.arabic);
+        await new Promise((resolve) => setTimeout(resolve, 450));
+      }
     }
-    setIsPlayingAll(false);
+    setPlayingAll(false);
   };
 
   return (
-    <div className="space-y-6 pb-24">
-      <div className="rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-900/80 via-[#063327] to-[#031d16] p-6 sm:p-8">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 text-amber-300 text-xs font-bold border border-amber-500/30">
-          <BookOpenText className="w-3.5 h-3.5" /> Noorani Qaida
-        </div>
-        <h1 className="mt-3 text-2xl sm:text-4xl font-extrabold text-white">Noorani Qaida</h1>
-        <p className="mt-2 max-w-2xl text-sm text-slate-300">
-          Learn to read Arabic from the beginning: the 28 letters, their shapes, vowels, and how letters join into Quran words. Tap any letter or word to hear it.
+    <div className="space-y-4 rounded-3xl bg-[#f7f1e3] p-3 text-stone-900 sm:p-5">
+      <div className="rounded-2xl border border-stone-300 bg-white p-4 shadow-sm">
+        <p className="text-xs font-bold uppercase tracking-wider text-emerald-800">Complete Noorani Qaida</p>
+        <h1 className="mt-1 text-2xl font-extrabold text-stone-950">Noorani Qaida</h1>
+        <p className="mt-1 text-sm text-stone-600">
+          Eighteen lessons, from single letters to joined words, vowels, sukoon, shaddah, madd, and Surah Al-Fatiha.
         </p>
-      </div>
-
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        {[
-          { id: "letters", label: "1. Alphabet" },
-          { id: "forms", label: "2. Letter Shapes" },
-          { id: "harakat", label: "3. Vowels" },
-          { id: "joining", label: "4. Joining Words" },
-        ].map((item) => (
+        <div className="mt-4 flex flex-wrap items-center gap-2">
           <button
-            key={item.id}
-            onClick={() => setSection(item.id as QaidaSection)}
-            className={`shrink-0 px-4 py-2 rounded-xl text-sm font-semibold ${
-              section === item.id
-                ? "bg-emerald-600 text-white"
-                : "bg-emerald-950/60 text-slate-300 border border-emerald-900"
-            }`}
+            onClick={() => setLessonIndex((current) => Math.max(0, current - 1))}
+            disabled={lessonIndex === 0}
+            className="rounded-xl border border-stone-300 bg-white px-3 py-2 text-xs font-semibold disabled:opacity-40"
           >
-            {item.label}
+            <ChevronLeft className="mr-1 inline h-4 w-4" /> Previous lesson
           </button>
-        ))}
+          <select
+            value={lessonIndex}
+            onChange={(event) => setLessonIndex(Number(event.target.value))}
+            className="rounded-xl border border-stone-300 bg-white px-3 py-2 text-sm font-semibold"
+          >
+            {NOORANI_LESSONS.map((item, index) => (
+              <option key={item.id} value={index}>
+                {item.number}. {item.title}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={() => setLessonIndex((current) => Math.min(NOORANI_LESSONS.length - 1, current + 1))}
+            disabled={lessonIndex === NOORANI_LESSONS.length - 1}
+            className="rounded-xl border border-stone-300 bg-white px-3 py-2 text-xs font-semibold disabled:opacity-40"
+          >
+            Next lesson <ChevronRight className="ml-1 inline h-4 w-4" />
+          </button>
+          <button
+            onClick={() => playLesson(lesson)}
+            disabled={playingAll}
+            className="rounded-xl bg-emerald-700 px-3 py-2 text-xs font-bold text-white disabled:opacity-60"
+          >
+            <Volume2 className="mr-1 inline h-4 w-4" />
+            {playingAll ? "Playing..." : "Play this lesson"}
+          </button>
+        </div>
       </div>
 
-      {section === "letters" && (
-        <div className="space-y-4">
-          <div className="flex justify-end">
-            <button
-              onClick={playAllLetters}
-              disabled={isPlayingAll}
-              className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold flex items-center gap-2 disabled:opacity-60"
-            >
-              {isPlayingAll ? <Loader2 className="w-4 h-4 animate-spin" /> : <Volume2 className="w-4 h-4" />}
-              {isPlayingAll ? "Reciting..." : "Listen to all 28 letters"}
-            </button>
-          </div>
-          <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
-            {QAIDA_LETTERS.map((letter) => (
-              <button
-                key={letter.id}
-                onClick={() => {
-                  setSelectedLetter(letter);
-                  playLetterPronunciation(letter.id, letter.letter);
-                }}
-                className={`p-3 rounded-2xl border text-center ${
-                  selectedLetter.id === letter.id
-                    ? "bg-emerald-800 border-amber-400 text-amber-200"
-                    : "bg-emerald-950/40 border-emerald-900 text-slate-200"
-                }`}
-              >
-                <span className="font-arabic text-3xl block">{letter.isolated}</span>
-                <span className="text-[11px]">{letter.name}</span>
-              </button>
-            ))}
-          </div>
-          <div className="rounded-2xl border border-emerald-800 bg-[#041a14] p-5 space-y-2">
-            <h2 className="text-xl font-bold text-white">
-              {selectedLetter.name} <span className="font-arabic text-amber-300">{selectedLetter.isolated}</span>
-            </h2>
-            <p className="text-sm text-emerald-300">{selectedLetter.makhrajGroup}</p>
-            <p className="text-sm text-slate-300">{selectedLetter.makhrajDetail}</p>
-            <p className="text-sm text-amber-200">{selectedLetter.tips}</p>
-          </div>
-        </div>
-      )}
-
-      {section === "forms" && (
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 text-xs text-emerald-300">
-            <Eye className="w-4 h-4" /> Choose a shape, then tap a letter to hear it.
-          </div>
-          <div className="flex gap-2">
-            {(["isolated", "initial", "medial", "final"] as const).map((mode) => (
-              <button
-                key={mode}
-                onClick={() => setFormMode(mode)}
-                className={`px-3 py-1.5 rounded-lg text-xs capitalize ${
-                  formMode === mode ? "bg-emerald-600 text-white" : "bg-emerald-950 text-slate-300"
-                }`}
-              >
-                {mode}
-              </button>
-            ))}
-          </div>
-          <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
-            {QAIDA_LETTERS.map((letter) => {
-              const shape =
-                formMode === "initial"
-                  ? letter.initial
-                  : formMode === "medial"
-                  ? letter.medial
-                  : formMode === "final"
-                  ? letter.final
-                  : letter.isolated;
-              return (
-                <button
-                  key={letter.id}
-                  onClick={() => playLetterPronunciation(letter.id, letter.letter)}
-                  className="p-3 rounded-2xl border border-emerald-900 bg-emerald-950/40 text-center"
-                >
-                  <span className="font-arabic text-3xl text-amber-300 block">{shape}</span>
-                  <span className="text-[11px] text-slate-300">{letter.name}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {section === "harakat" && (
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
-            {HARAKAT_LESSONS.map((lesson) => (
-              <button
-                key={lesson.id}
-                onClick={() => setSelectedHarakat(lesson)}
-                className={`p-3 rounded-xl border text-center ${
-                  selectedHarakat.id === lesson.id
-                    ? "bg-blue-900/70 border-blue-400 text-white"
-                    : "bg-emerald-950/40 border-emerald-900 text-slate-300"
-                }`}
-              >
-                <span className="font-arabic text-2xl text-amber-300 block">{lesson.symbol}</span>
-                <span className="text-xs">{lesson.title.split(" ")[0]}</span>
-              </button>
-            ))}
-          </div>
-          <div className="rounded-2xl border border-blue-500/30 bg-[#041a14] p-5 space-y-4">
-            <h2 className="text-xl font-bold text-white">{selectedHarakat.title}</h2>
-            <p className="text-sm text-slate-300">{selectedHarakat.description}</p>
-            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-              {selectedHarakat.examples.map((example) => (
-                <button
-                  key={example.arabic}
-                  onClick={() => playLetterPronunciation(example.audioText, example.arabic)}
-                  className="p-3 rounded-xl border border-emerald-900 bg-emerald-950/50"
-                >
-                  <span className="font-arabic text-3xl text-blue-300 block">{example.arabic}</span>
-                  <span className="text-xs text-white">{example.transliteration}</span>
-                </button>
-              ))}
-            </div>
-            <div className="grid sm:grid-cols-2 gap-2">
-              {selectedHarakat.practiceWords.map((word) => (
-                <button
-                  key={word.word}
-                  onClick={() => playLetterPronunciation(word.transliteration, word.word)}
-                  className="p-3 rounded-xl border border-emerald-900 flex items-center justify-between text-left"
-                >
-                  <span>
-                    <span className="block text-sm font-semibold text-white">{word.transliteration}</span>
-                    <span className="text-xs text-slate-400">{word.meaning}</span>
-                  </span>
-                  <span className="font-arabic text-3xl text-amber-300">{word.word}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {section === "joining" && (
-        <div className="space-y-4">
-          <p className="text-sm text-slate-300 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-amber-300" />
-            Practice reading joined Quran words. Tap a card to hear the word.
+      <article className="rounded-3xl border border-stone-200 bg-white p-4 sm:p-6">
+        <header className="border-b border-stone-200 pb-4 text-center">
+          <p className="text-xs font-bold uppercase tracking-wider text-emerald-800">
+            Lesson {lesson.number} of {NOORANI_LESSONS.length}
           </p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {JOINING_WORDS.map((item) => (
-              <button
-                key={item.word}
-                onClick={() => playLetterPronunciation(item.transliteration, item.word)}
-                className="p-4 rounded-2xl border border-emerald-800 bg-[#06241c] flex items-center justify-between text-left"
-              >
-                <span>
-                  <span className="block font-semibold text-white">{item.transliteration}</span>
-                  <span className="text-xs text-slate-400">{item.meaning}</span>
-                </span>
-                <span className="font-arabic text-3xl text-emerald-300">{item.word}</span>
-              </button>
-            ))}
-          </div>
+          <h2 className="mt-1 text-2xl font-extrabold">{lesson.title}</h2>
+          <p className="font-arabic text-3xl text-emerald-900">{lesson.arabicTitle}</p>
+          <p className="mx-auto mt-2 max-w-2xl text-sm text-stone-600">{lesson.instruction}</p>
+        </header>
+
+        <div className="mt-5 space-y-6">
+          {lesson.groups.map((group) => (
+            <section key={group.title}>
+              <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-emerald-800">{group.title}</h3>
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-7">
+                {group.items.map((card) => (
+                  <button
+                    key={`${group.title}-${card.arabic}-${card.transliteration}`}
+                    onClick={() => playCard(card)}
+                    className="rounded-2xl border border-stone-200 bg-[#fffaf0] p-3 text-center hover:border-emerald-600"
+                  >
+                    <span className="font-arabic block text-3xl leading-relaxed text-stone-950 sm:text-4xl" dir="rtl">
+                      {card.arabic}
+                    </span>
+                    <span className="mt-1 block text-[11px] font-semibold text-stone-600">{card.transliteration}</span>
+                    {card.note && <span className="mt-1 block text-[10px] text-emerald-800">{card.note}</span>}
+                  </button>
+                ))}
+              </div>
+            </section>
+          ))}
         </div>
-      )}
+      </article>
     </div>
   );
 }
