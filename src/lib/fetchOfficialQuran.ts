@@ -1,5 +1,17 @@
 import { SURAH_LIST } from "@/data/surahMetadata";
-import { cleanVerseText, resolveQuranScript, stripHtml } from "@/lib/quranScripts";
+import { cleanVerseText, resolveQuranScript } from "@/lib/quranScripts";
+
+function stripHtml(text: string): string {
+  return text
+    .replace(/<sup\b[^>]*>[\s\S]*?<\/sup>/gi, "")
+    .replace(/<[^>]*>/g, "")
+    .replace(/&quot;/g, "\"")
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, "&")
+    .replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
 export interface OfficialAyah {
   number: number;
