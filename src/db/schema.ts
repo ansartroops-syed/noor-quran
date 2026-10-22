@@ -13,7 +13,7 @@ export const userProfiles = pgTable("user_profiles", {
   dailyGoalMinutes: integer("daily_goal_minutes").default(15),
   minutesSpentToday: integer("minutes_spent_today").default(0),
   preferredReciter: text("preferred_reciter").default("Alafasy_128kbps"),
-  preferredScript: text("preferred_script").default("standard"),
+  preferredScript: text("preferred_script").default("uthmani"),
   preferredTranslation: text("preferred_translation").default("saheeh"),
   arabicFontSize: integer("arabic_font_size").default(28),
   showTransliteration: boolean("show_transliteration").default(true),

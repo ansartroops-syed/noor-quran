@@ -3,21 +3,16 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Navbar, AppTab } from "@/components/Navbar";
 import { LearnQuranTab } from "@/components/LearnQuranTab";
+import { QuranReaderTab } from "@/components/QuranReaderTab";
+import { TajweedMasterclassTab } from "@/components/TajweedMasterclassTab";
+import { VocabularyFlashcardsTab } from "@/components/VocabularyFlashcardsTab";
+import { BookmarksTab, BookmarkItem } from "@/components/BookmarksTab";
 import { NooraniQaidaTab } from "@/components/NooraniQaidaTab";
 import { ReadQuranTab } from "@/components/ReadQuranTab";
 import { HifzQuranTab } from "@/components/HifzQuranTab";
 import { KidsQuizTab } from "@/components/KidsQuizTab";
-import { QuranReaderTab } from "@/components/QuranReaderTab";
-import { TajweedMasterclassTab } from "@/components/TajweedMasterclassTab";
-import { VocabularyFlashcardsTab } from "@/components/VocabularyFlashcardsTab";
-import { AdminLoginModal } from "@/components/AdminLoginModal";
-import { clearAdminSession, verifyAdminSession } from "@/lib/adminAuth";
-import { KIDS_MATHS_LEVELS } from "@/data/kidsMathsQuiz";
-import { KIDS_ENGLISH_LEVELS } from "@/data/kidsEnglishQuiz";
-import { KIDS_GK_LEVELS } from "@/data/kidsGKQuiz";
-import { BookmarksTab, BookmarkItem } from "@/components/BookmarksTab";
-// Kept for future use — hidden from navigation per owner request (do not delete).
-import { AndroidPublishingHubTab } from "@/components/AndroidPublishingHubTab";
+import { PrivateQuizBoard } from "@/components/PrivateQuizBoard";
+import { LoginModal } from "@/components/LoginModal";
 import { AudioPlayerBar, ActiveAudioState } from "@/components/AudioPlayerBar";
 import { SearchModal } from "@/components/SearchModal";
 import { VoiceRecorderModal } from "@/components/VoiceRecorderModal";
@@ -26,40 +21,13 @@ import { CertificateModal } from "@/components/CertificateModal";
 import { SettingsModal, UserPreferences } from "@/components/SettingsModal";
 import { SURAH_LIST } from "@/data/surahMetadata";
 import confetti from "canvas-confetti";
-import { Lock } from "lucide-react";
-
-function PrivateLockedScreen({
-  onOpenLogin,
-  subject,
-}: {
-  onOpenLogin: () => void;
-  subject: string;
-}) {
-  return (
-    <div className="max-w-md mx-auto py-16 text-center space-y-5">
-      <div className="w-20 h-20 mx-auto rounded-full bg-amber-500/15 border border-amber-500/40 flex items-center justify-center">
-        <Lock className="w-9 h-9 text-amber-300" />
-      </div>
-      <h2 className="text-2xl font-extrabold text-white">{subject} is private 🔒</h2>
-      <p className="text-sm text-slate-300 leading-relaxed">
-        This quiz is only for the family account. Please sign in to continue.
-      </p>
-      <button
-        onClick={onOpenLogin}
-        className="px-6 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm transition"
-      >
-        Family Login
-      </button>
-    </div>
-  );
-}
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState<AppTab>("learn");
   const [currentSurahNumber, setCurrentSurahNumber] = useState<number>(1);
   const [highlightAyahNumber, setHighlightAyahNumber] = useState<number | undefined>(undefined);
 
-  // User Profile / Settings (default script = standard Mushaf Imlaei)
+  // User Profile / Settings
   const [preferences, setPreferences] = useState<UserPreferences>({
     name: "Seeker of Knowledge",
     preferredReciter: "Alafasy_128kbps",
@@ -90,26 +58,7 @@ export default function HomePage() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-
-  // Private family area — Kids Maths / English / GK tabs are visible
-  // ONLY when signed in as admin. Guests never see them.
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [adminName, setAdminName] = useState<string | null>(null);
-
-  const PRIVATE_TABS: AppTab[] = ["maths", "english", "gk"];
-
-  const handleLogout = () => {
-    clearAdminSession();
-    setIsAdmin(false);
-    setAdminName(null);
-    setActiveTab((prev) => (PRIVATE_TABS.includes(prev) ? "learn" : prev));
-  };
-
-  const handleLoginSuccess = (username: string) => {
-    setIsAdmin(true);
-    setAdminName(username);
-    setIsLoginOpen(false);
-  };
+  const [privateUser, setPrivateUser] = useState<{ username: string; role: string } | null>(null);
   const [voiceRecorderData, setVoiceRecorderData] = useState<{
     isOpen: boolean;
     surahNumber: number;
@@ -164,28 +113,21 @@ export default function HomePage() {
 
   // Fetch initial profile & bookmarks on mount
   useEffect(() => {
-    // Check URL params for tab navigation (e.g. ?tab=read)
-    // "android_hub" kept for future direct-link use even though hidden from nav.
+    // Check URL params for tab navigation (e.g. ?tab=quran)
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const tabParam = params.get("tab") as AppTab;
-      if (tabParam && ["learn", "qaida", "read", "quran", "hifz", "kids", "maths", "english", "gk", "tajweed", "vocab", "bookmarks", "android_hub"].includes(tabParam)) {
+      if (tabParam && ["learn", "qaida", "quran", "read", "hifz", "kids", "tajweed", "vocab", "bookmarks"].includes(tabParam)) {
         setActiveTab(tabParam);
       }
     }
 
-    // Verify family/admin session for private tabs
-    verifyAdminSession()
-      .then(({ isAdmin: ok, username }) => {
-        setIsAdmin(ok);
-        setAdminName(username);
-        if (!ok) {
-          setActiveTab((prev) => (["maths", "english", "gk"].includes(prev) ? "learn" : prev));
-        }
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.user) setPrivateUser(data.user);
       })
-      .catch(() => {
-        // stay logged out on error
-      });
+      .catch(() => setPrivateUser(null));
 
     // Profile API
     fetch("/api/profile?userId=guest-user")
@@ -203,7 +145,7 @@ export default function HomePage() {
             ...prev,
             name: p.name || prev.name,
             preferredReciter: p.preferredReciter || prev.preferredReciter,
-            preferredScript: p.preferredScript || prev.preferredScript,
+            preferredScript: !p.preferredScript || p.preferredScript === "uthmani" || p.preferredScript === "mushaf" ? "standard" : p.preferredScript,
             preferredTranslation: p.preferredTranslation || prev.preferredTranslation,
             arabicFontSize: p.arabicFontSize || prev.arabicFontSize,
             showTransliteration: p.showTransliteration ?? prev.showTransliteration,
@@ -273,97 +215,64 @@ export default function HomePage() {
     }
   };
 
-  const surahHasBismillah = (n: number) => n !== 1 && n !== 9;
+  const startAyahForSurah = (surahNumber: number) => {
+    const meta = SURAH_LIST.find((surah) => surah.number === surahNumber);
+    return meta?.bismillahPre ? 0 : 1;
+  };
+
+  const playSurahAt = (surahNumber: number, ayahNumber: number) => {
+    const meta = SURAH_LIST.find((surah) => surah.number === surahNumber);
+    if (!meta) return;
+    setCurrentSurahNumber(surahNumber);
+    setHighlightAyahNumber(ayahNumber > 0 ? ayahNumber : undefined);
+    setActiveTab("quran");
+    setAudioState({
+      surahNumber,
+      ayahNumber,
+      surahName: meta.nameTransliterated,
+      totalAyahs: meta.versesCount,
+      isPlaying: true,
+      reciterSubfolder: preferences.preferredReciter,
+    });
+  };
 
   const handleNextAyah = () => {
     if (!audioState) return;
-    // Bismillah track (0) -> Ayah 1 of same Surah
-    if (audioState.ayahNumber === 0) {
-      setAudioState({ ...audioState, ayahNumber: 1, isPlaying: true });
-      setHighlightAyahNumber(1);
-      return;
-    }
-    // Normal advance within Surah
     if (audioState.ayahNumber < audioState.totalAyahs) {
-      setAudioState({
-        ...audioState,
-        ayahNumber: audioState.ayahNumber + 1,
-        isPlaying: true,
-      });
-      setHighlightAyahNumber(audioState.ayahNumber + 1);
+      const nextAyah = audioState.ayahNumber + 1;
+      setAudioState({ ...audioState, ayahNumber: nextAyah, isPlaying: true });
+      setHighlightAyahNumber(nextAyah);
       return;
     }
-    // End of Surah -> auto-continue into next Surah (Bismillah first, except 1 & 9)
     if (audioState.surahNumber < 114) {
-      const nextNum = audioState.surahNumber + 1;
-      const nextMeta = SURAH_LIST.find((s) => s.number === nextNum);
-      const startAyah = surahHasBismillah(nextNum) ? 0 : 1;
-      setCurrentSurahNumber(nextNum);
-      setHighlightAyahNumber(startAyah);
-      setAudioState({
-        surahNumber: nextNum,
-        ayahNumber: startAyah,
-        surahName: nextMeta?.nameTransliterated || `Surah ${nextNum}`,
-        totalAyahs: nextMeta?.versesCount || 7,
-        isPlaying: true,
-        reciterSubfolder: audioState.reciterSubfolder,
-      });
+      playSurahAt(audioState.surahNumber + 1, startAyahForSurah(audioState.surahNumber + 1));
     }
   };
 
   const handlePrevAyah = () => {
     if (!audioState) return;
-    // From Bismillah track -> last Ayah of previous Surah
-    if (audioState.ayahNumber === 0) {
-      if (audioState.surahNumber > 1) {
-        const prevNum = audioState.surahNumber - 1;
-        const prevMeta = SURAH_LIST.find((s) => s.number === prevNum);
-        const lastAyah = prevMeta?.versesCount || 7;
-        setCurrentSurahNumber(prevNum);
-        setHighlightAyahNumber(lastAyah);
-        setAudioState({
-          surahNumber: prevNum,
-          ayahNumber: lastAyah,
-          surahName: prevMeta?.nameTransliterated || `Surah ${prevNum}`,
-          totalAyahs: lastAyah,
-          isPlaying: true,
-          reciterSubfolder: audioState.reciterSubfolder,
-        });
-      }
+    if (audioState.ayahNumber > startAyahForSurah(audioState.surahNumber)) {
+      const previousAyah = audioState.ayahNumber - 1;
+      setAudioState({ ...audioState, ayahNumber: previousAyah, isPlaying: true });
+      setHighlightAyahNumber(previousAyah > 0 ? previousAyah : undefined);
       return;
     }
-    // From Ayah 1 with Bismillah -> Bismillah track of same Surah
-    if (audioState.ayahNumber === 1) {
-      if (surahHasBismillah(audioState.surahNumber)) {
-        setAudioState({ ...audioState, ayahNumber: 0, isPlaying: true });
-        setHighlightAyahNumber(0);
-        return;
-      }
-      // Ayah 1 without Bismillah -> last Ayah of previous Surah
-      if (audioState.surahNumber > 1) {
-        const prevNum = audioState.surahNumber - 1;
-        const prevMeta = SURAH_LIST.find((s) => s.number === prevNum);
-        const lastAyah = prevMeta?.versesCount || 7;
-        setCurrentSurahNumber(prevNum);
-        setHighlightAyahNumber(lastAyah);
-        setAudioState({
-          surahNumber: prevNum,
-          ayahNumber: lastAyah,
-          surahName: prevMeta?.nameTransliterated || `Surah ${prevNum}`,
-          totalAyahs: lastAyah,
-          isPlaying: true,
-          reciterSubfolder: audioState.reciterSubfolder,
-        });
-      }
-      return;
+    if (audioState.surahNumber > 1) {
+      const previous = SURAH_LIST.find((surah) => surah.number === audioState.surahNumber - 1);
+      if (previous) playSurahAt(previous.number, previous.versesCount);
     }
-    // Normal step back within Surah
-    setAudioState({
-      ...audioState,
-      ayahNumber: audioState.ayahNumber - 1,
-      isPlaying: true,
-    });
-    setHighlightAyahNumber(audioState.ayahNumber - 1);
+  };
+
+  const handleNextSurah = () => {
+    if (!audioState) return;
+    if (audioState.surahNumber >= 114) return;
+    playSurahAt(audioState.surahNumber + 1, startAyahForSurah(audioState.surahNumber + 1));
+  };
+
+  const handlePrevSurah = () => {
+    if (!audioState) return;
+    if (audioState.surahNumber <= 1) return;
+    playSurahAt(audioState.surahNumber - 1, startAyahForSurah(audioState.surahNumber - 1));
   };
 
   // Bookmarking
@@ -502,11 +411,13 @@ export default function HomePage() {
         currentLevel={currentLevel}
         onOpenSearch={() => setIsSearchOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
-        isPlayingAudio={Boolean(audioState?.isPlaying)}
-        isAdmin={isAdmin}
-        adminName={adminName}
-        onOpenLogin={() => setIsLoginOpen(true)}
-        onLogout={handleLogout}
+        privateUser={privateUser}
+        onSignIn={() => setIsLoginOpen(true)}
+        onSignOut={async () => {
+          await fetch("/api/auth/logout", { method: "POST" });
+          setPrivateUser(null);
+          setActiveTab("learn");
+        }}
       />
 
       {/* Main Container */}
@@ -544,46 +455,16 @@ export default function HomePage() {
           />
         )}
 
-        {/* TAB: NOORANI QAIDAH (dedicated foundation tab) */}
-        {activeTab === "qaida" && (
-          <NooraniQaidaTab
-            onOpenQuiz={(quizKey, levelNum, levelTitle, badgeName) => {
-              setQuizModalData({
-                isOpen: true,
-                quizKey,
-                levelNumber: levelNum,
-                levelTitle,
-                badgeName,
-              });
-            }}
-            onPracticeInQuran={(surahNum) => {
-              setCurrentSurahNumber(surahNum);
-              setActiveTab("quran");
-            }}
-          />
-        )}
-
-        {/* TAB: READ QURAN (pure Arabic Mushaf reading) */}
+        {activeTab === "qaida" && <NooraniQaidaTab />}
+        {activeTab === "hifz" && <HifzQuranTab />}
+        {activeTab === "kids" && <KidsQuizTab />}
+        {privateUser && activeTab === "maths" && <PrivateQuizBoard subject="maths" title="Kids Maths" />}
+        {privateUser && activeTab === "english" && <PrivateQuizBoard subject="english" title="English Quiz" />}
+        {privateUser && activeTab === "gk" && <PrivateQuizBoard subject="gk" title="General Knowledge Quiz" />}
         {activeTab === "read" && (
           <ReadQuranTab
-            currentSurahNumber={currentSurahNumber}
-            highlightAyahNumber={highlightAyahNumber}
-            preferences={preferences}
-            isPlayingAudio={Boolean(audioState?.isPlaying)}
-            playingAyahNumber={audioState?.ayahNumber}
-            onPlayAyah={handlePlayAyah}
-            onSurahChange={(num) => {
-              setCurrentSurahNumber(num);
-            }}
-            onReciterChange={(subfolder) => {
-              handleUpdatePreferences({ preferredReciter: subfolder });
-              setAudioState((prev) =>
-                prev ? { ...prev, reciterSubfolder: subfolder, isPlaying: true } : prev
-              );
-            }}
-            onScriptChange={(id) => {
-              handleUpdatePreferences({ preferredScript: id });
-            }}
+            script={preferences.preferredScript}
+            onScriptChange={(scriptId) => handleUpdatePreferences({ preferredScript: scriptId })}
           />
         )}
 
@@ -595,91 +476,19 @@ export default function HomePage() {
             preferences={preferences}
             isPlayingAudio={Boolean(audioState?.isPlaying)}
             playingAyahNumber={audioState?.ayahNumber}
+            playingSurahNumber={audioState?.surahNumber}
             onPlayAyah={handlePlayAyah}
+            onSelectSurah={(surahNumber) => {
+              setCurrentSurahNumber(surahNumber);
+              setHighlightAyahNumber(undefined);
+            }}
             onOpenVoiceRecorder={handleOpenVoiceRecorderForAyah}
             onSaveBookmark={handleSaveBookmark}
             bookmarkedAyahs={bookmarkedMap}
-            onReciterChange={(subfolder) => {
-              handleUpdatePreferences({ preferredReciter: subfolder });
-              // If audio is playing, switch voice instantly on same ayah
-              setAudioState((prev) =>
-                prev ? { ...prev, reciterSubfolder: subfolder, isPlaying: true } : prev
-              );
-            }}
-            onSurahChange={(num) => {
-              setCurrentSurahNumber(num);
-            }}
-            onScriptChange={(id) => {
-              handleUpdatePreferences({ preferredScript: id });
-            }}
+            script={preferences.preferredScript}
+            onScriptChange={(scriptId) => handleUpdatePreferences({ preferredScript: scriptId })}
           />
         )}
-
-        {/* TAB: HIFZ QURAN (memorize the entire Quran) */}
-        {activeTab === "hifz" && (
-          <HifzQuranTab
-            currentSurahNumber={currentSurahNumber}
-            preferences={preferences}
-            onPlayAyah={handlePlayAyah}
-            onSurahChange={(num) => {
-              setCurrentSurahNumber(num);
-            }}
-            onAddXp={(amount) => setXp((prev) => prev + amount)}
-          />
-        )}
-
-        {/* TAB: KIDS QURAN QUIZ (fun, interactive, multi-level) */}
-        {activeTab === "kids" && (
-          <KidsQuizTab onAddXp={(amount) => setXp((prev) => prev + amount)} />
-        )}
-
-        {/* PRIVATE FAMILY TABS — rendered ONLY for signed-in admin.
-            Guests never see these tabs in the nav AND cannot reach them
-            even via direct URL (?tab=maths etc.): they get a lock screen. */}
-        {activeTab === "maths" &&
-          (isAdmin ? (
-            <KidsQuizTab
-              levels={KIDS_MATHS_LEVELS}
-              storageKey="noor-kids-maths-stars"
-              headerTitle="Kids Maths Quiz"
-              headerSubtitle="9 fun levels across Basic 🌱, Medium 🚀 and Hard 🏆! Answers shuffle every game! Tap an answer and collect ⭐⭐⭐!"
-              headerEmoji="🔢"
-              grownUpNote="family-only area — progress auto-saves on this device."
-              onAddXp={(amount) => setXp((prev) => prev + amount)}
-            />
-          ) : (
-            <PrivateLockedScreen onOpenLogin={() => setIsLoginOpen(true)} subject="Kids Maths" />
-          ))}
-
-        {activeTab === "english" &&
-          (isAdmin ? (
-            <KidsQuizTab
-              levels={KIDS_ENGLISH_LEVELS}
-              storageKey="noor-kids-english-stars"
-              headerTitle="Kids English Quiz"
-              headerSubtitle="9 fun levels across Basic 🌱, Medium 🚀 and Hard 🏆! Answers shuffle every game! Tap an answer, hear it read aloud, and collect ⭐⭐⭐!"
-              headerEmoji="🔤"
-              grownUpNote="family-only area — progress auto-saves on this device."
-              onAddXp={(amount) => setXp((prev) => prev + amount)}
-            />
-          ) : (
-            <PrivateLockedScreen onOpenLogin={() => setIsLoginOpen(true)} subject="Kids English" />
-          ))}
-
-        {activeTab === "gk" &&
-          (isAdmin ? (
-            <KidsQuizTab
-              levels={KIDS_GK_LEVELS}
-              storageKey="noor-kids-gk-stars"
-              headerTitle="Kids GK Quiz"
-              headerSubtitle="9 fun levels across Basic 🌱, Medium 🚀 and Hard 🏆! Answers shuffle every game! Tap an answer and collect ⭐⭐⭐!"
-              headerEmoji="🌍"
-              grownUpNote="family-only area — progress auto-saves on this device."
-              onAddXp={(amount) => setXp((prev) => prev + amount)}
-            />
-          ) : (
-            <PrivateLockedScreen onOpenLogin={() => setIsLoginOpen(true)} subject="Kids GK" />
-          ))}
 
         {/* TAB 3: TAJWEED MASTERCLASS */}
         {activeTab === "tajweed" && (
@@ -730,10 +539,10 @@ export default function HomePage() {
           />
         )}
 
-        {/* HIDDEN TAB: ANDROID & GOOGLE PLAY STORE PUBLISHING HUB
-            Kept for future use — reachable via ?tab=android_hub, hidden from nav. */}
-        {activeTab === "android_hub" && <AndroidPublishingHubTab />}
       </main>
+      <footer className="pb-24 pt-2 text-center text-xs text-slate-500">
+        Noor Quran by NajAns
+      </footer>
 
       {/* Persistent Recitation Audio Player Bar */}
       <AudioPlayerBar
@@ -745,6 +554,8 @@ export default function HomePage() {
         }}
         onNextAyah={handleNextAyah}
         onPrevAyah={handlePrevAyah}
+        onNextSurah={handleNextSurah}
+        onPrevSurah={handlePrevSurah}
         onOpenVoiceRecorder={(surahNum, ayahNum) => {
           handleOpenVoiceRecorderForAyah(surahNum, ayahNum);
         }}
@@ -809,18 +620,17 @@ export default function HomePage() {
       />
 
       {/* App Settings & Qari Selector Modal */}
+      {isLoginOpen && (
+        <LoginModal
+          onClose={() => setIsLoginOpen(false)}
+          onSuccess={(user) => setPrivateUser(user)}
+        />
+      )}
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         preferences={preferences}
         onUpdatePreferences={handleUpdatePreferences}
-      />
-
-      {/* Family / Admin Login Modal (private quizzes) */}
-      <AdminLoginModal
-        isOpen={isLoginOpen}
-        onClose={() => setIsLoginOpen(false)}
-        onSuccess={handleLoginSuccess}
       />
     </div>
   );

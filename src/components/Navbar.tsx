@@ -3,45 +3,28 @@
 import React, { useState } from "react";
 import {
   BookOpen,
-  BookOpenCheck,
+  BookOpenText,
+  ScrollText,
   GraduationCap,
   Sparkles,
   Layers,
   Bookmark,
-  Search,
-  Settings,
-  Flame,
-  Award,
-  Volume2,
-  BookOpenText,
   Brain,
-  Rocket,
   Calculator,
   Languages,
   Globe2,
   LogIn,
   LogOut,
-  ShieldCheck,
+  Puzzle,
+  Search,
+  Settings,
+  Flame,
+  Award,
+  Volume2,
 } from "lucide-react";
 import { testQuranAudio, playHarmonicChime } from "@/lib/audioEngine";
 
-// NOTE: "android_hub" is intentionally kept in the type + page renderer for
-// future use, but hidden from the visible navigation (per owner request).
-// "maths" | "english" | "gk" are private family tabs — only shown when logged in.
-export type AppTab =
-  | "learn"
-  | "qaida"
-  | "read"
-  | "quran"
-  | "hifz"
-  | "kids"
-  | "maths"
-  | "english"
-  | "gk"
-  | "tajweed"
-  | "vocab"
-  | "bookmarks"
-  | "android_hub";
+export type AppTab = "learn" | "qaida" | "quran" | "read" | "hifz" | "kids" | "maths" | "english" | "gk" | "tajweed" | "vocab" | "bookmarks" | "android_hub";
 
 interface NavbarProps {
   activeTab: AppTab;
@@ -52,10 +35,9 @@ interface NavbarProps {
   onOpenSearch: () => void;
   onOpenSettings: () => void;
   isPlayingAudio?: boolean;
-  isAdmin?: boolean;
-  adminName?: string | null;
-  onOpenLogin?: () => void;
-  onLogout?: () => void;
+  privateUser?: { username: string; role: string } | null;
+  onSignIn?: () => void;
+  onSignOut?: () => void;
 }
 
 export function Navbar({
@@ -67,30 +49,30 @@ export function Navbar({
   onOpenSearch,
   onOpenSettings,
   isPlayingAudio = false,
-  isAdmin = false,
-  adminName = null,
-  onOpenLogin,
-  onLogout,
+  privateUser = null,
+  onSignIn,
+  onSignOut,
 }: NavbarProps) {
   const [testingAudio, setTestingAudio] = useState(false);
 
-  const allTabs = [
+  const tabs = [
     { id: "learn", label: "Learn Quran", icon: GraduationCap, badge: "Levels 1-6" },
-    { id: "qaida", label: "Noorani Qaidah", icon: BookOpenText, badge: "New" },
-    { id: "read", label: "Read Quran", icon: BookOpenCheck, badge: "Mushaf" },
+    { id: "qaida", label: "Noorani Qaida", icon: BookOpenText, badge: "18 Lessons" },
     { id: "quran", label: "Full Quran", icon: BookOpen, badge: "114 Surahs" },
+    { id: "read", label: "Read Quran", icon: ScrollText, badge: "Arabic" },
     { id: "hifz", label: "Hifz Quran", icon: Brain, badge: "Memorize" },
-    { id: "kids", label: "Kids Quiz", icon: Rocket, badge: "Fun" },
-    { id: "maths", label: "Kids Maths", icon: Calculator, badge: "Private", adminOnly: true },
-    { id: "english", label: "Kids English", icon: Languages, badge: "Private", adminOnly: true },
-    { id: "gk", label: "Kids GK", icon: Globe2, badge: "Private", adminOnly: true },
+    { id: "kids", label: "Kids Quran Quiz", icon: Puzzle, badge: "Basic–Hard" },
+    ...(privateUser
+      ? [
+          { id: "maths", label: "Kids Maths", icon: Calculator, badge: "Private" },
+          { id: "english", label: "English Quiz", icon: Languages, badge: "Private" },
+          { id: "gk", label: "General Knowledge", icon: Globe2, badge: "Private" },
+        ]
+      : []),
     { id: "tajweed", label: "Tajweed Guide", icon: Sparkles },
     { id: "vocab", label: "Vocabulary", icon: Layers, badge: "Top 100" },
     { id: "bookmarks", label: "My Goals & Notes", icon: Bookmark },
   ];
-
-  // Private family tabs are NEVER rendered for guests — not even hidden.
-  const tabs = allTabs.filter((t) => !(t as { adminOnly?: boolean }).adminOnly || isAdmin);
 
   const handleTestAudioClick = async () => {
     setTestingAudio(true);
@@ -118,12 +100,9 @@ export function Navbar({
               <span className="font-extrabold text-white text-base sm:text-lg tracking-tight group-hover:text-emerald-300 transition">
                 Noor Quran by NajAns
               </span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
-                PRO
-              </span>
             </div>
             <p className="text-[10px] text-slate-400 font-medium hidden sm:block">
-              Learn Quran from Basics to Advanced & Complete Quran
+              Learn Quran from Noorani Qaida to the complete Quran
             </p>
           </div>
         </button>
@@ -163,34 +142,6 @@ export function Navbar({
             <span>{xp} XP</span>
           </div>
 
-          {/* Family Login / Admin chip */}
-          {isAdmin ? (
-            <div className="flex items-center gap-1.5">
-              <span
-                className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-bold"
-                title={`Signed in as ${adminName ?? "family"}`}
-              >
-                <ShieldCheck className="w-3.5 h-3.5" />
-                {adminName ?? "Family"}
-              </span>
-              <button
-                onClick={onLogout}
-                className="p-2 rounded-xl bg-emerald-950/60 hover:bg-rose-900/60 text-slate-300 hover:text-white border border-emerald-800 transition"
-                title="Log out of family account"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={onOpenLogin}
-              className="p-2 rounded-xl bg-emerald-950/60 hover:bg-emerald-900 text-slate-300 hover:text-white border border-emerald-800 transition"
-              title="Family login — unlocks private quizzes"
-            >
-              <LogIn className="w-4 h-4" />
-            </button>
-          )}
-
           {/* Quick Search */}
           <button
             onClick={onOpenSearch}
@@ -200,6 +151,24 @@ export function Navbar({
             <Search className="w-4 h-4" />
           </button>
 
+          {privateUser ? (
+            <button
+              onClick={onSignOut}
+              className="flex items-center gap-1 rounded-xl border border-emerald-800 bg-emerald-950/60 px-2.5 py-1 text-xs font-semibold text-emerald-200"
+              title={`Signed in as ${privateUser.username}`}
+            >
+              <LogOut className="h-4 w-4" />
+              <span className="hidden sm:inline">{privateUser.username}</span>
+            </button>
+          ) : (
+            <button
+              onClick={onSignIn}
+              className="flex items-center gap-1 rounded-xl border border-emerald-800 bg-emerald-950/60 px-2.5 py-1 text-xs font-semibold text-slate-200"
+            >
+              <LogIn className="h-4 w-4" />
+              <span className="hidden sm:inline">Sign in</span>
+            </button>
+          )}
           {/* Settings */}
           <button
             onClick={onOpenSettings}
@@ -217,11 +186,12 @@ export function Navbar({
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
 
-          const btnClass =
-            "flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition shrink-0 " +
-            (isActive
-              ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/30 "
-              : "text-slate-300 hover:text-white hover:bg-emerald-950/60 ");
+          let btnClass =
+            "flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition shrink-0 ";
+
+          btnClass += isActive
+            ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/30 "
+            : "text-slate-300 hover:text-white hover:bg-emerald-950/60 ";
 
           return (
             <button
@@ -234,11 +204,7 @@ export function Navbar({
               {tab.badge && (
                 <span
                   className={`text-[9px] px-1.5 py-0.2 rounded-full uppercase tracking-tighter font-extrabold ${
-                    isActive
-                      ? "bg-white/20 text-white"
-                      : (tab as { adminOnly?: boolean }).adminOnly
-                        ? "bg-amber-500/20 text-amber-300 border border-amber-500/40"
-                        : "bg-emerald-900 text-emerald-300"
+                    isActive ? "bg-white/20 text-white" : "bg-emerald-900 text-emerald-300"
                   }`}
                 >
                   {tab.badge}

@@ -1,7 +1,7 @@
 {
-  "name": "Noor Quran by NajAns: Learn & Complete Quran",
+  "name": "Noor Quran by NajAns",
   "short_name": "Noor Quran by NajAns",
-  "description": "Noor Quran by NajAns — Learn Quran from Arabic basics and Tajweed to complete Quran recitation with English translation, transliteration, and audio.",
+  "description": "Noor Quran by NajAns — learn Quran from Arabic basics, Noorani Qaida and Tajweed to complete Quran recitation with English translation, transliteration, and audio.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#064e3b",
@@ -29,29 +29,9 @@
       "description": "Continue your Quran learning lessons"
     },
     {
-      "name": "Read Quran",
-      "url": "/?tab=read",
-      "description": "Pure Arabic Mushaf reading with translation options"
-    },
-    {
       "name": "Read Full Quran",
       "url": "/?tab=quran",
       "description": "Open Quran reader with translation and audio"
-    },
-    {
-      "name": "Noorani Qaidah",
-      "url": "/?tab=qaida",
-      "description": "Practice Noorani Qaidah alphabet and Harakat"
-    },
-    {
-      "name": "Hifz Quran",
-      "url": "/?tab=hifz",
-      "description": "Memorize the entire Quran step by step"
-    },
-    {
-      "name": "Kids Quiz",
-      "url": "/?tab=kids",
-      "description": "Fun Quran quiz adventure for kids"
     },
     {
       "name": "Tajweed Masterclass",
