@@ -226,9 +226,9 @@ bubblewrap build
 ];
 
 export const PLAY_STORE_METADATA = {
-  appTitle: "Noor Quran: Learn Quran & Tajweed",
+  appTitle: "Noor Quran by NajAns: Learn Quran & Tajweed",
   shortDescription: "Learn Quran from Arabic basics to complete Quran with Tajweed & English translation.",
-  fullDescription: `Embark on a transformative spiritual and educational journey with Noor Quran — the ultimate interactive app designed to teach you how to read, understand, and master the Holy Quran from the absolute basics to complete recitation.
+  fullDescription: `Embark on a transformative spiritual and educational journey with Noor Quran by NajAns — the ultimate interactive app designed to teach you how to read, understand, and master the Holy Quran from the absolute basics to complete recitation.
 
 ✨ KEY LEARNING FEATURES:
 
@@ -273,11 +273,11 @@ export const PLAY_STORE_METADATA = {
 100% Free of intrusive distractions. Designed for learners of all ages.`,
   category: "Education",
   contentRating: "Everyone / PEGI 3",
-  privacyPolicyText: `Privacy Policy for Noor Quran
+  privacyPolicyText: `Privacy Policy for Noor Quran by NajAns
 
 Last updated: 2026
 
-Noor Quran ("we", "our", or "the App") is committed to protecting your privacy. This Privacy Policy explains how information is handled within our application.
+Noor Quran by NajAns ("we", "our", or "the App") is committed to protecting your privacy. This Privacy Policy explains how information is handled within our application.
 
 1. Information We Collect:
 - Local Storage & Sync Data: We store user learning progress, XP points, completed quiz scores, bookmarks, and user interface preferences locally on your device or securely synced to our backend database.
@@ -287,7 +287,7 @@ Noor Quran ("we", "our", or "the App") is committed to protecting your privacy. 
 We do not track or sell your personal identifiable information. We do not use third-party behavioral advertising trackers.
 
 3. Children's Privacy:
-Noor Quran complies with COPPA and global child privacy regulations. The app does not collect personal identification from children under 13.
+Noor Quran by NajAns complies with COPPA and global child privacy regulations. The app does not collect personal identification from children under 13.
 
 4. Data Security:
 We implement standard security measures to protect stored bookmark and progress data.
