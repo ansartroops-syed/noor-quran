@@ -9,6 +9,8 @@ import { VocabularyFlashcardsTab } from "@/components/VocabularyFlashcardsTab";
 import { BookmarksTab, BookmarkItem } from "@/components/BookmarksTab";
 import { NooraniQaidaTab } from "@/components/NooraniQaidaTab";
 import { ReadQuranTab } from "@/components/ReadQuranTab";
+import { HifzQuranTab } from "@/components/HifzQuranTab";
+import { KidsQuizTab } from "@/components/KidsQuizTab";
 import { AudioPlayerBar, ActiveAudioState } from "@/components/AudioPlayerBar";
 import { SearchModal } from "@/components/SearchModal";
 import { VoiceRecorderModal } from "@/components/VoiceRecorderModal";
@@ -111,7 +113,7 @@ export default function HomePage() {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const tabParam = params.get("tab") as AppTab;
-      if (tabParam && ["learn", "qaida", "quran", "read", "tajweed", "vocab", "bookmarks"].includes(tabParam)) {
+      if (tabParam && ["learn", "qaida", "quran", "read", "hifz", "kids", "tajweed", "vocab", "bookmarks"].includes(tabParam)) {
         setActiveTab(tabParam);
       }
     }
@@ -436,6 +438,8 @@ export default function HomePage() {
         )}
 
         {activeTab === "qaida" && <NooraniQaidaTab />}
+        {activeTab === "hifz" && <HifzQuranTab />}
+        {activeTab === "kids" && <KidsQuizTab />}
         {activeTab === "read" && (
           <ReadQuranTab
             script={preferences.preferredScript}

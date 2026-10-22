@@ -9,6 +9,8 @@ import {
   Sparkles,
   Layers,
   Bookmark,
+  Brain,
+  Puzzle,
   Search,
   Settings,
   Flame,
@@ -17,7 +19,7 @@ import {
 } from "lucide-react";
 import { testQuranAudio, playHarmonicChime } from "@/lib/audioEngine";
 
-export type AppTab = "learn" | "qaida" | "quran" | "read" | "tajweed" | "vocab" | "bookmarks" | "android_hub";
+export type AppTab = "learn" | "qaida" | "quran" | "read" | "hifz" | "kids" | "tajweed" | "vocab" | "bookmarks" | "android_hub";
 
 interface NavbarProps {
   activeTab: AppTab;
@@ -47,6 +49,8 @@ export function Navbar({
     { id: "qaida", label: "Noorani Qaida", icon: BookOpenText, badge: "18 Lessons" },
     { id: "quran", label: "Full Quran", icon: BookOpen, badge: "114 Surahs" },
     { id: "read", label: "Read Quran", icon: ScrollText, badge: "Arabic" },
+    { id: "hifz", label: "Hifz Quran", icon: Brain, badge: "Memorize" },
+    { id: "kids", label: "Kids Quran Quiz", icon: Puzzle, badge: "6 Levels" },
     { id: "tajweed", label: "Tajweed Guide", icon: Sparkles },
     { id: "vocab", label: "Vocabulary", icon: Layers, badge: "Top 100" },
     { id: "bookmarks", label: "My Goals & Notes", icon: Bookmark },
