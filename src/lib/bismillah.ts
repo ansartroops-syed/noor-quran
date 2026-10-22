@@ -23,7 +23,7 @@ export const BISMILLAH_TRANSLATION =
 export function bismillahForScript(script: string): string {
   if (script === "indopak") return "بِسۡمِ اللهِ الرَّحۡمٰنِ الرَّحِیۡمِ";
   if (script === "plain") return "بسم الله الرحمن الرحيم";
-  if (script === "uthmani") return "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ";
+  if (script === "uthmani" || script === "mushaf") return "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ";
   return BISMILLAH_ARABIC; // standard / default
 }
 

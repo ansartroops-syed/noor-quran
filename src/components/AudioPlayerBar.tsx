@@ -20,11 +20,16 @@ import { getAyahFallbackUrls } from "@/lib/audioEngine";
 
 export interface ActiveAudioState {
   surahNumber: number;
+  // ayahNumber 0 = Bismillah opening track (001001.mp3) before Ayah 1
   ayahNumber: number;
   surahName: string;
   totalAyahs: number;
   isPlaying: boolean;
   reciterSubfolder: string;
+}
+
+export function isBismillahTrack(ayahNumber: number): boolean {
+  return ayahNumber === 0;
 }
 
 interface AudioPlayerBarProps {
@@ -35,8 +40,6 @@ interface AudioPlayerBarProps {
   onOpenVoiceRecorder: (surahNumber: number, ayahNumber: number) => void;
   onOpenSettings: () => void;
   onClosePlayer: () => void;
-  onNextSurah: () => void;
-  onPrevSurah: () => void;
 }
 
 export function AudioPlayerBar({
@@ -47,8 +50,6 @@ export function AudioPlayerBar({
   onOpenVoiceRecorder,
   onOpenSettings,
   onClosePlayer,
-  onNextSurah,
-  onPrevSurah,
 }: AudioPlayerBarProps) {
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.0);
   const [repeatMode, setRepeatMode] = useState<"none" | "single" | "continuous">("continuous");
@@ -71,13 +72,15 @@ export function AudioPlayerBar({
       return;
     }
 
-    const sourceSurah = audioState.ayahNumber === 0 ? 1 : audioState.surahNumber;
-    const sourceAyah = audioState.ayahNumber === 0 ? 1 : audioState.ayahNumber;
-    const fallbackList = getAyahFallbackUrls(
-      sourceSurah,
-      sourceAyah,
-      audioState.reciterSubfolder
-    );
+    // Bismillah track (ayah 0) always plays 001001.mp3 in the current reciter voice
+    const fallbackList =
+      audioState.ayahNumber === 0
+        ? getAyahFallbackUrls(1, 1, audioState.reciterSubfolder)
+        : getAyahFallbackUrls(
+            audioState.surahNumber,
+            audioState.ayahNumber,
+            audioState.reciterSubfolder
+          );
     urlsRef.current = fallbackList;
     fallbackIndexRef.current = 0;
 
@@ -126,6 +129,7 @@ export function AudioPlayerBar({
           audioRef.current.play().catch(console.error);
         }
       } else if (repeatMode === "continuous") {
+        // Parent advances within Surah AND across Surahs (Bismillah included)
         onNextAyah();
       }
     };
@@ -164,6 +168,10 @@ export function AudioPlayerBar({
   }, [volume, isMuted]);
 
   if (!audioState) return null;
+
+  const showingBismillah = audioState.ayahNumber === 0;
+  const isFirstTrack = audioState.surahNumber <= 1 && audioState.ayahNumber <= 1;
+  const isLastTrack = audioState.surahNumber >= 114 && audioState.ayahNumber >= audioState.totalAyahs;
 
   const toggleRepeat = () => {
     if (repeatMode === "continuous") setRepeatMode("single");
@@ -204,7 +212,13 @@ export function AudioPlayerBar({
         <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
           <div className="flex items-center gap-2.5">
             <span className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-300 font-bold text-xs shrink-0">
-              {isLoading ? <Loader2 className="w-4 h-4 animate-spin text-emerald-400" /> : audioState.ayahNumber === 0 ? "ب" : audioState.ayahNumber}
+              {isLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
+              ) : showingBismillah ? (
+                <span className="font-arabic text-base">﷽</span>
+              ) : (
+                audioState.ayahNumber
+              )}
             </span>
             <div className="min-w-0">
               <div className="text-xs sm:text-sm font-bold text-white truncate flex items-center gap-1.5">
@@ -218,9 +232,9 @@ export function AudioPlayerBar({
                 )}
               </div>
               <div className="text-[11px] text-emerald-400">
-                {audioState.ayahNumber === 0
-                  ? "Bismillah, then the surah"
-                  : `Ayah ${audioState.ayahNumber} of ${audioState.totalAyahs}`}
+                {showingBismillah
+                  ? `Bismillah • Surah ${audioState.surahNumber}`
+                  : `Surah ${audioState.surahNumber} • Ayah ${audioState.ayahNumber} of ${audioState.totalAyahs}`}
               </div>
             </div>
           </div>
@@ -255,19 +269,12 @@ export function AudioPlayerBar({
               )}
             </button>
 
-            {/* Prev */}
-            <button
-              onClick={onPrevSurah}
-              disabled={audioState.surahNumber <= 1 && audioState.ayahNumber <= 1}
-              className="px-2 py-1 rounded-lg text-[11px] font-semibold text-emerald-300 hover:bg-emerald-900/50 disabled:opacity-30"
-              title="Previous Surah"
-            >
-              Prev Surah
-            </button>
+            {/* Prev — crosses into previous Surah via parent */}
             <button
               onClick={onPrevAyah}
+              disabled={isFirstTrack}
               className="p-1.5 rounded-lg text-slate-300 hover:text-white disabled:opacity-30 transition"
-              title="Previous Ayah"
+              title="Previous (crosses Surahs)"
             >
               <SkipBack className="w-4 h-4 fill-current" />
             </button>
@@ -287,21 +294,14 @@ export function AudioPlayerBar({
               )}
             </button>
 
-            {/* Next */}
+            {/* Next — crosses into next Surah via parent */}
             <button
               onClick={onNextAyah}
+              disabled={isLastTrack}
               className="p-1.5 rounded-lg text-slate-300 hover:text-white disabled:opacity-30 transition"
-              title="Next Ayah or next Surah"
+              title="Next (crosses Surahs)"
             >
               <SkipForward className="w-4 h-4 fill-current" />
-            </button>
-            <button
-              onClick={onNextSurah}
-              disabled={audioState.surahNumber >= 114}
-              className="px-2 py-1 rounded-lg text-[11px] font-semibold text-emerald-300 hover:bg-emerald-900/50 disabled:opacity-30"
-              title="Next Surah"
-            >
-              Next Surah
             </button>
 
             {/* Speed Selector */}
@@ -370,7 +370,7 @@ export function AudioPlayerBar({
         {/* Right Tools (Voice Recorder & Settings) */}
         <div className="hidden sm:flex items-center gap-2">
           <button
-            onClick={() => onOpenVoiceRecorder(audioState.surahNumber, audioState.ayahNumber)}
+            onClick={() => onOpenVoiceRecorder(audioState.surahNumber, Math.max(1, audioState.ayahNumber))}
             className="px-3 py-1.5 rounded-xl bg-teal-800/60 hover:bg-teal-700 text-teal-200 font-semibold text-xs flex items-center gap-1.5 border border-teal-500/30 transition shadow-sm"
           >
             <Mic className="w-3.5 h-3.5 text-teal-300" /> Practice Voice

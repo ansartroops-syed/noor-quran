@@ -6,203 +6,194 @@ export interface ReciterOption {
   subname: string;
   subfolder: string;
   quality: string;
+  category: "Most Popular" | "Haram Imams" | "Murattal (Study)" | "Mujawwad (Melodic)" | "Soothing Voices";
   isSlowForLearning?: boolean;
 }
 
 export const AVAILABLE_RECITERS: ReciterOption[] = [
+  // ── Most Popular ──────────────────────────────────
   {
     id: "Alafasy_128kbps",
-    name: "Sheikh Mishary Rashid Alafasy",
-    subname: "Clear, melodious and globally beloved",
+    name: "Mishary Rashid Alafasy",
+    subname: "Clear, melodious & globally beloved",
     subfolder: "Alafasy_128kbps",
     quality: "128 kbps",
-  },
-  {
-    id: "Abdurrahmaan_As-Sudais_192kbps",
-    name: "Sheikh Abdurrahman As-Sudais",
-    subname: "Imam of Masjid al-Haram, Makkah",
-    subfolder: "Abdurrahmaan_As-Sudais_192kbps",
-    quality: "192 kbps",
-  },
-  {
-    id: "Saood_ash-Shuraym_128kbps",
-    name: "Sheikh Saud Ash-Shuraim",
-    subname: "Imam of Masjid al-Haram, Makkah",
-    subfolder: "Saood_ash-Shuraym_128kbps",
-    quality: "128 kbps",
-  },
-  {
-    id: "MaherAlMuaiqly128kbps",
-    name: "Sheikh Maher Al-Muaiqly",
-    subname: "Imam of Masjid al-Haram, Makkah",
-    subfolder: "MaherAlMuaiqly128kbps",
-    quality: "128 kbps",
-  },
-  {
-    id: "Yasser_Ad-Dussary_128kbps",
-    name: "Sheikh Yasser Al-Dosari",
-    subname: "Imam of Masjid al-Haram, emotional recitation",
-    subfolder: "Yasser_Ad-Dussary_128kbps",
-    quality: "128 kbps",
-  },
-  {
-    id: "Salah_Al_Budair_128kbps",
-    name: "Sheikh Salah Al-Budair",
-    subname: "Imam of Masjid an-Nabawi, Madinah",
-    subfolder: "Salah_Al_Budair_128kbps",
-    quality: "128 kbps",
-  },
-  {
-    id: "Husary_Muallim_128kbps",
-    name: "Sheikh Al-Husary (Muallim)",
-    subname: "Slow teaching recitation for learners",
-    subfolder: "Husary_Muallim_128kbps",
-    quality: "128 kbps",
-    isSlowForLearning: true,
+    category: "Most Popular",
   },
   {
     id: "Husary_128kbps",
-    name: "Sheikh Mahmoud Khalil Al-Husary",
-    subname: "Clear murattal, excellent for Tajweed",
+    name: "Mahmoud Khalil Al-Husary",
+    subname: "Master of Tajweed precision",
     subfolder: "Husary_128kbps",
     quality: "128 kbps",
-    isSlowForLearning: true,
+    category: "Most Popular",
   },
   {
-    id: "Ayman_Sowaid_64kbps",
-    name: "Sheikh Ayman Suwaid",
-    subname: "Tajweed teacher recitation",
-    subfolder: "Ayman_Sowaid_64kbps",
-    quality: "64 kbps",
+    id: "Husary_Muallim_128kbps",
+    name: "Mahmoud Khalil Al-Husary (Muallim)",
+    subname: "Slow teaching recitation — best for beginners",
+    subfolder: "Husary_Muallim_128kbps",
+    quality: "128 kbps",
+    category: "Most Popular",
     isSlowForLearning: true,
   },
   {
     id: "Abdul_Basit_Murattal_192kbps",
-    name: "Sheikh Abdul Basit (Murattal)",
-    subname: "Steady murattal by the golden voice",
+    name: "Abdul Basit Abdul Samad (Murattal)",
+    subname: "Legendary golden voice — clear study style",
     subfolder: "Abdul_Basit_Murattal_192kbps",
     quality: "192 kbps",
+    category: "Most Popular",
   },
   {
     id: "Abdul_Basit_Mujawwad_128kbps",
-    name: "Sheikh Abdul Basit (Mujawwad)",
-    subname: "Legendary melodic mujawwad",
+    name: "Abdul Basit Abdul Samad (Mujawwad)",
+    subname: "Legendary slow melodic style",
     subfolder: "Abdul_Basit_Mujawwad_128kbps",
     quality: "128 kbps",
+    category: "Mujawwad (Melodic)",
   },
+  // ── Haram Imams (Makkah & Madinah) ────────────────
   {
-    id: "Minshawy_Murattal_128kbps",
-    name: "Sheikh Al-Minshawi (Murattal)",
-    subname: "Clear teaching-style murattal",
-    subfolder: "Minshawy_Murattal_128kbps",
+    id: "MaherAlMuaiqly128kbps",
+    name: "Maher Al-Muaiqly",
+    subname: "Imam of Masjid Al-Haram, Makkah",
+    subfolder: "MaherAlMuaiqly128kbps",
     quality: "128 kbps",
+    category: "Haram Imams",
   },
   {
-    id: "Minshawy_Mujawwad_192kbps",
-    name: "Sheikh Mohamed Siddiq Al-Minshawi",
-    subname: "Deep, soulful mujawwad",
-    subfolder: "Minshawy_Mujawwad_192kbps",
+    id: "Abdurrahmaan_As-Sudais_192kbps",
+    name: "Abdurrahman As-Sudais",
+    subname: "Imam of Masjid Al-Haram, Makkah",
+    subfolder: "Abdurrahmaan_As-Sudais_192kbps",
     quality: "192 kbps",
+    category: "Haram Imams",
   },
   {
-    id: "Abu_Bakr_Ash-Shaatree_128kbps",
-    name: "Sheikh Abu Bakr Al-Shatri",
-    subname: "Soft, emotional and easy to follow",
-    subfolder: "Abu_Bakr_Ash-Shaatree_128kbps",
+    id: "Saood_ash-Shuraym_128kbps",
+    name: "Saud Ash-Shuraym",
+    subname: "Imam of Masjid Al-Haram, Makkah",
+    subfolder: "Saood_ash-Shuraym_128kbps",
     quality: "128 kbps",
+    category: "Haram Imams",
   },
   {
-    id: "Hani_Rifai_192kbps",
-    name: "Sheikh Hani Ar-Rifai",
-    subname: "Calm and beautiful recitation",
-    subfolder: "Hani_Rifai_192kbps",
-    quality: "192 kbps",
-  },
-  {
-    id: "Muhammad_Ayyoub_128kbps",
-    name: "Sheikh Muhammad Ayyub",
-    subname: "Former Imam of Masjid an-Nabawi",
-    subfolder: "Muhammad_Ayyoub_128kbps",
+    id: "Yasser_Ad-Dussary_128kbps",
+    name: "Yasser Ad-Dossari",
+    subname: "Imam of Masjid Al-Haram, Makkah",
+    subfolder: "Yasser_Ad-Dussary_128kbps",
     quality: "128 kbps",
-  },
-  {
-    id: "Muhammad_Jibreel_128kbps",
-    name: "Sheikh Muhammad Jibreel",
-    subname: "Powerful Egyptian recitation",
-    subfolder: "Muhammad_Jibreel_128kbps",
-    quality: "128 kbps",
-  },
-  {
-    id: "Nasser_Alqatami_128kbps",
-    name: "Sheikh Nasser Al-Qatami",
-    subname: "Smooth modern recitation",
-    subfolder: "Nasser_Alqatami_128kbps",
-    quality: "128 kbps",
-  },
-  {
-    id: "Ali_Jaber_64kbps",
-    name: "Sheikh Ali Jaber",
-    subname: "Imam of Masjid al-Haram",
-    subfolder: "Ali_Jaber_64kbps",
-    quality: "64 kbps",
-  },
-  {
-    id: "Fares_Abbad_64kbps",
-    name: "Sheikh Fares Abbad",
-    subname: "Imam of Masjid al-Haram",
-    subfolder: "Fares_Abbad_64kbps",
-    quality: "64 kbps",
-  },
-  {
-    id: "Ahmed_ibn_Ali_al-Ajamy_128kbps_ketaballah.net",
-    name: "Sheikh Ahmed Al-Ajmi",
-    subname: "Widely loved emotional voice",
-    subfolder: "Ahmed_ibn_Ali_al-Ajamy_128kbps_ketaballah.net",
-    quality: "128 kbps",
+    category: "Haram Imams",
   },
   {
     id: "Hudhaify_128kbps",
-    name: "Sheikh Ali Al-Hudhaify",
-    subname: "Imam of Masjid an-Nabawi",
+    name: "Ali Al-Hudhaify",
+    subname: "Imam of Masjid An-Nabawi, Madinah",
     subfolder: "Hudhaify_128kbps",
     quality: "128 kbps",
+    category: "Haram Imams",
   },
   {
-    id: "Ghamadi_40kbps",
-    name: "Sheikh Saad Al-Ghamdi",
-    subname: "Warm, rhythmic and soothing",
-    subfolder: "Ghamadi_40kbps",
-    quality: "40 kbps",
+    id: "Muhammad_Ayyoub_128kbps",
+    name: "Muhammad Ayyoub",
+    subname: "Imam of Masjid An-Nabawi, Madinah",
+    subfolder: "Muhammad_Ayyoub_128kbps",
+    quality: "128 kbps",
+    category: "Haram Imams",
+  },
+  {
+    id: "Salah_Al_Budair_128kbps",
+    name: "Salah Al-Budair",
+    subname: "Imam of Masjid An-Nabawi, Madinah",
+    subfolder: "Salah_Al_Budair_128kbps",
+    quality: "128 kbps",
+    category: "Haram Imams",
+  },
+  // ── Murattal (Study) ──────────────────────────────
+  {
+    id: "Minshawy_Murattal_128kbps",
+    name: "Mohamed Siddiq Al-Minshawi (Murattal)",
+    subname: "Deep, soulful — excellent for memorisation",
+    subfolder: "Minshawy_Murattal_128kbps",
+    quality: "128 kbps",
+    category: "Murattal (Study)",
+  },
+  {
+    id: "Abu_Bakr_Ash-Shaatree_128kbps",
+    name: "Abu Bakr Ash-Shatri",
+    subname: "Calm and steady study recitation",
+    subfolder: "Abu_Bakr_Ash-Shaatree_128kbps",
+    quality: "128 kbps",
+    category: "Murattal (Study)",
   },
   {
     id: "Abdullah_Basfar_192kbps",
-    name: "Sheikh Abdullah Basfar",
-    subname: "Clear Saudi recitation",
+    name: "Abdullah Basfar",
+    subname: "Clear Hijazi style",
     subfolder: "Abdullah_Basfar_192kbps",
     quality: "192 kbps",
+    category: "Murattal (Study)",
   },
   {
-    id: "Mustafa_Ismail_48kbps",
-    name: "Sheikh Mustafa Ismail",
-    subname: "Classic Egyptian mujawwad master",
-    subfolder: "Mustafa_Ismail_48kbps",
-    quality: "48 kbps",
-  },
-  {
-    id: "Mohammad_al_Tablaway_128kbps",
-    name: "Sheikh Mohammad Al-Tablawi",
-    subname: "Classic Egyptian recitation",
-    subfolder: "Mohammad_al_Tablaway_128kbps",
+    id: "Abdullah_Matroud_128kbps",
+    name: "Abdullah Matroud",
+    subname: "Soft and precise",
+    subfolder: "Abdullah_Matroud_128kbps",
     quality: "128 kbps",
+    category: "Murattal (Study)",
   },
   {
-    id: "English_Sahih_Ibrahim_Walk",
-    name: "English: Sahih International",
-    subname: "English meaning recited by Ibrahim Walk",
-    subfolder: "English/Sahih_Intnl_Ibrahim_Walk_192kbps",
+    id: "Ghamadi_40kbps",
+    name: "Saad Al-Ghamadi",
+    subname: "Fast, rhythmic & soothing",
+    subfolder: "Ghamadi_40kbps",
+    quality: "40 kbps",
+    category: "Murattal (Study)",
+  },
+  // ── Mujawwad & Soothing ───────────────────────────
+  {
+    id: "Minshawy_Mujawwad_192kbps",
+    name: "Mohamed Siddiq Al-Minshawi (Mujawwad)",
+    subname: "Slow melodic Tajweed masterpiece",
+    subfolder: "Minshawy_Mujawwad_192kbps",
     quality: "192 kbps",
+    category: "Mujawwad (Melodic)",
+  },
+  {
+    id: "Hani_Rifai_192kbps",
+    name: "Hani Ar-Rifai",
+    subname: "Emotional, heart-touching voice",
+    subfolder: "Hani_Rifai_192kbps",
+    quality: "192 kbps",
+    category: "Soothing Voices",
+  },
+  {
+    id: "Muhammad_Jibreel_128kbps",
+    name: "Muhammad Jibreel",
+    subname: "Famous Taraweeh cryful recitation",
+    subfolder: "Muhammad_Jibreel_128kbps",
+    quality: "128 kbps",
+    category: "Soothing Voices",
   },
 ];
+
+export const RECITER_CATEGORIES = [
+  "All",
+  "Most Popular",
+  "Haram Imams",
+  "Murattal (Study)",
+  "Mujawwad (Melodic)",
+  "Soothing Voices",
+] as const;
+
+export function getReciterBySubfolder(subfolder: string): ReciterOption | undefined {
+  return AVAILABLE_RECITERS.find((r) => r.subfolder === subfolder);
+}
+
+export function getReciterDisplayName(subfolder: string): string {
+  return getReciterBySubfolder(subfolder)?.name ?? subfolder.replace(/_/g, " ");
+}
 
 const ALPHABET_AUDIO_MAP: Record<string, string> = {
   alif: "/audio/alphabet/alif.mp3",
@@ -243,17 +234,10 @@ let activePronunciationAudio: HTMLAudioElement | null = null;
 /**
  * Returns primary EveryAyah CDN URL
  */
-function encodeReciterPath(reciterSubfolder: string): string {
-  return reciterSubfolder
-    .split("/")
-    .map((part) => encodeURIComponent(part))
-    .join("/");
-}
-
 export function getAyahAudioUrl(surahNumber: number, ayahNumber: number, reciterSubfolder = "Alafasy_128kbps"): string {
   const surahStr = String(surahNumber).padStart(3, "0");
   const ayahStr = String(ayahNumber).padStart(3, "0");
-  return `https://everyayah.com/data/${encodeReciterPath(reciterSubfolder)}/${surahStr}${ayahStr}.mp3`;
+  return `https://everyayah.com/data/${reciterSubfolder}/${surahStr}${ayahStr}.mp3`;
 }
 
 /**
@@ -263,11 +247,10 @@ export function getAyahFallbackUrls(surahNumber: number, ayahNumber: number, rec
   const surahStr = String(surahNumber).padStart(3, "0");
   const ayahStr = String(ayahNumber).padStart(3, "0");
   
-  const primary = `https://everyayah.com/data/${encodeReciterPath(reciterSubfolder)}/${surahStr}${ayahStr}.mp3`;
   return [
-    primary,
-    `https://everyayah.com/data/Alafasy_128kbps/${surahStr}${ayahStr}.mp3`,
+    `https://everyayah.com/data/${reciterSubfolder}/${surahStr}${ayahStr}.mp3`,
     `https://verses.quran.com/Alafasy/mp3/${surahStr}${ayahStr}.mp3`,
+    `https://everyayah.com/data/Alafasy_128kbps/${surahStr}${ayahStr}.mp3`,
     `https://everyayah.com/data/Husary_128kbps/${surahStr}${ayahStr}.mp3`,
   ];
 }

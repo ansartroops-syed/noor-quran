@@ -1,44 +1,60 @@
 "use client";
 
-import { QURAN_SCRIPTS, resolveQuranScript } from "@/lib/quranScripts";
+import React from "react";
+import { QURAN_SCRIPTS } from "@/lib/quranScripts";
 
 interface QuranScriptPickerProps {
   value: string;
-  onChange: (scriptId: string) => void;
+  onChange?: (id: string) => void;
+  compact?: boolean;
 }
 
-export function QuranScriptPicker({ value, onChange }: QuranScriptPickerProps) {
-  const selected = resolveQuranScript(value);
+// Local normalizer — intentionally NOT imported from "@/lib/quranScripts"
+// so this component builds even if that module is an older cached copy.
+function normalizeScriptId(v: unknown): string {
+  if (typeof v === "string") {
+    const s = v.trim().toLowerCase();
+    if (s === "standard" || s === "uthmani" || s === "mushaf" || s === "indopak" || s === "plain") {
+      return s;
+    }
+  }
+  return "standard";
+}
 
+/**
+ * QuranScriptPicker — compatibility picker used by the Read route.
+ * Self-contained: only depends on QURAN_SCRIPTS (present in every
+ * version of the module), never on newer helper exports.
+ */
+export function QuranScriptPicker({ value, onChange, compact = false }: QuranScriptPickerProps) {
+  const current = normalizeScriptId(value);
   return (
-    <section className="rounded-2xl border border-stone-300 bg-white p-4 text-stone-900 shadow-sm">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-wider text-emerald-800">Reading theme</p>
-          <h2 className="text-lg font-extrabold text-stone-950">Choose a light Quran theme</h2>
-        </div>
-        <span className="rounded-full bg-emerald-700 px-3 py-1 text-xs font-bold text-white">
-          {selected.label}
-        </span>
-      </div>
-      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-        {QURAN_SCRIPTS.map((script) => {
-          const active = selected.id === script.id;
+    <div className="space-y-2">
+      <div className={`grid gap-2 ${compact ? "grid-cols-2" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"}`}>
+        {QURAN_SCRIPTS.map((s) => {
+          const active = current === s.id;
           return (
             <button
-              key={script.id}
+              key={s.id}
               type="button"
-              onClick={() => onChange(script.id)}
-              className={`rounded-xl border p-3 text-left text-stone-900 ${
-                active ? "border-emerald-700 ring-2 ring-emerald-700" : "border-stone-300"
-              } ${script.themeClass}`}
+              onClick={() => onChange?.(s.id)}
+              title={s.desc}
+              className={`p-2.5 rounded-xl border text-left transition ${
+                active
+                  ? "bg-emerald-700/70 border-amber-400 ring-1 ring-amber-400/50 text-white"
+                  : "bg-emerald-950/50 border-emerald-900 text-slate-300 hover:border-emerald-500"
+              }`}
             >
-              <span className="block text-sm font-bold">{script.label}</span>
-              <span className="mt-1 block text-[11px] text-stone-600">{script.description}</span>
+              <div className="text-xs font-bold leading-tight">{s.label}</div>
+              <div className="font-arabic text-[11px] text-amber-300/70" dir="rtl">
+                {s.arabicLabel}
+              </div>
             </button>
           );
         })}
       </div>
-    </section>
+    </div>
   );
 }
+
+export default QuranScriptPicker;

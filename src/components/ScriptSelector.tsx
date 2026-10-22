@@ -2,17 +2,21 @@
 
 import React from "react";
 import { ScrollText, Check, ShieldCheck } from "lucide-react";
-import { QURAN_SCRIPTS, type QuranScriptId } from "@/lib/quranScripts";
+import { QURAN_SCRIPTS } from "@/lib/quranScripts";
 
 interface ScriptSelectorProps {
-  value: QuranScriptId;
-  onChange: (id: QuranScriptId) => void;
+  value: string;
+  onChange: (id: string) => void;
   compact?: boolean;
 }
 
-const PREVIEW_AYAH: Record<QuranScriptId, string> = {
+// NOTE: intentionally Record<string, string> (NOT Record<QuranScriptId, string>)
+// so this file compiles against ANY version of quranScripts.ts (4 or 5 scripts).
+// A partial push can never break the build again.
+const PREVIEW_AYAH: Record<string, string> = {
   standard: "بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ",
   uthmani: "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
+  mushaf: "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
   indopak: "بِسۡمِ اللهِ الرَّحۡمٰنِ الرَّحِیۡمِ",
   plain: "بسم الله الرحمن الرحيم",
 };
@@ -29,7 +33,7 @@ export function ScriptSelector({ value, onChange, compact = false }: ScriptSelec
         <ScrollText className="w-3.5 h-3.5" />
         Arabic Text Script
       </div>
-      <div className={`grid gap-2 ${compact ? "grid-cols-2" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"}`}>
+      <div className={`grid gap-2 ${compact ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5"}`}>
         {QURAN_SCRIPTS.map((s) => {
           const active = value === s.id;
           return (
@@ -52,7 +56,7 @@ export function ScriptSelector({ value, onChange, compact = false }: ScriptSelec
                 dir="rtl"
                 lang="ar"
               >
-                {PREVIEW_AYAH[s.id]}
+                {PREVIEW_AYAH[s.id] ?? PREVIEW_AYAH.standard}
               </div>
               <div className="font-arabic text-[11px] text-amber-300/70" dir="rtl">
                 {s.arabicLabel}

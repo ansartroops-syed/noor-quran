@@ -1,118 +1,218 @@
-export const QURAN_SCRIPTS = [
+// Shared Mushaf script definitions — verified against quran.com v4
+// (King Fahd / Tanzil-compatible texts) + AlQuran Cloud fallback.
+// Order matters: Standard (Imlaei) is FIRST = the default most readers
+// recognise (no wasla, standard sukun). Uthmani/IndoPak keep their
+// authentic marks — those are correct Mushaf spellings, not mistakes.
+// "mushaf" = Madinah printed Mushaf (same Uthmani text, Mushaf layout).
+
+export type QuranScriptId = "standard" | "uthmani" | "mushaf" | "indopak" | "plain";
+
+export interface QuranScriptOption {
+  id: QuranScriptId;
+  label: string;
+  arabicLabel: string;
+  desc: string;
+  longDesc: string;
+  // CSS font stack tuned for this script (loaded in globals.css)
+  fontFamily: string;
+  fontClass:
+    | "font-script-standard"
+    | "font-script-uthmani"
+    | "font-script-mushaf"
+    | "font-script-indopak"
+    | "font-script-plain";
+  // quran.com v4 endpoint suffix under /quran/verses/
+  // NOTE: quran.com has no separate "mushaf" endpoint — Madinah Mushaf
+  // uses the Uthmani text, so mushaf maps to "uthmani" here.
+  quranComEndpoint: "imlaei" | "uthmani" | "indopak" | "uthmani_simple";
+  // alquran.cloud fallback edition for this script
+  fallbackEdition: string;
+  // human-readable source citation
+  sourceName: string;
+}
+
+export const DEFAULT_QURAN_SCRIPT: QuranScriptId = "standard";
+
+export const QURAN_SCRIPTS: QuranScriptOption[] = [
   {
     id: "standard",
-    label: "Standard Quran",
-    description: "Printed style, like common Quran apps",
-    endpoint: "standard",
-    field: "text_standard",
-    fontClass: "font-scheherazade",
-    themeClass: "quran-theme-uthmani",
-    bismillah: "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ",
+    label: "Mushaf Standard (Imlaei)",
+    arabicLabel: "الرسم الإملائي",
+    desc: "Clear standard spelling — familiar letters, full harakat. Default.",
+    longDesc:
+      "Standard Imlaei spelling (quran.com imlaei, verified). Uses plain alif (ا), standard sukun (ْ), full tashkeel. This is the clearest reading text and the default. Example 1:2 — الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ.",
+    fontFamily: "'Amiri', 'Noto Naskh Arabic', 'Scheherazade New', serif",
+    fontClass: "font-script-standard",
+    quranComEndpoint: "imlaei",
+    fallbackEdition: "quran-simple",
+    sourceName: "quran.com imlaei → AlQuran Cloud quran-simple",
   },
   {
     id: "uthmani",
-    label: "Uthmani",
-    description: "Madinah Uthmani vowels",
-    endpoint: "uthmani",
-    field: "text_uthmani",
-    fontClass: "font-scheherazade",
-    themeClass: "quran-theme-uthmani",
-    bismillah: "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ",
+    label: "Uthmani (Madinah Mushaf)",
+    arabicLabel: "الرسم العثماني",
+    desc: "Saudi Madinah Mushaf spelling — wasla (ٱ), dagger alef, waqf marks.",
+    longDesc:
+      "Authentic Madinah Mushaf (quran.com uthmani, King Fahd Complex compatible). The small wasla-alif (ٱ) and superscript marks (ـٰ) are CORRECT Uthmani orthography — e.g. ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ. Needs the Uthmani font to display perfectly.",
+    fontFamily: "'Amiri Quran', 'Scheherazade New', 'Amiri', serif",
+    fontClass: "font-script-uthmani",
+    quranComEndpoint: "uthmani",
+    fallbackEdition: "quran-uthmani",
+    sourceName: "quran.com uthmani → AlQuran Cloud quran-uthmani",
   },
   {
     id: "mushaf",
-    label: "Mushaf Al-Quran Standard",
-    description: "King Fahd Complex Hafs text",
-    endpoint: "qpc_hafs",
-    field: "text_qpc_hafs",
-    fontClass: "font-mushaf",
-    themeClass: "quran-theme-mushaf",
-    bismillah: "بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ",
+    label: "Mushaf Madinah (Print)",
+    arabicLabel: "مصحف المدينة",
+    desc: "Printed Madinah Mushaf layout — same Uthmani text, Mushaf page style.",
+    longDesc:
+      "Printed Madinah Mushaf (King Fahd Complex print). Same verified Uthmani text as the Uthmani option (quran.com uthmani), presented as the familiar Mushaf page. Example 1:2 — ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ.",
+    fontFamily: "'Amiri Quran', 'Scheherazade New', 'Amiri', serif",
+    fontClass: "font-script-mushaf",
+    quranComEndpoint: "uthmani",
+    fallbackEdition: "quran-uthmani",
+    sourceName: "quran.com uthmani (Madinah print) → AlQuran Cloud quran-uthmani",
   },
   {
     id: "indopak",
-    label: "IndoPak",
-    description: "South Asian script",
-    endpoint: "indopak",
-    field: "text_indopak",
-    fontClass: "font-indopak",
-    themeClass: "quran-theme-indopak",
-    bismillah: "بِسۡمِ اللهِ الرَّحۡمٰنِ الرَّحِيۡمِ",
+    label: "IndoPak (South Asian Mushaf)",
+    arabicLabel: "رسم هندو باكستاني",
+    desc: "Pakistani/Indian 15-line Hafizi print — explicit vowels, rounded jazm.",
+    longDesc:
+      "South-Asian Hafizi Mushaf (quran.com indopak). Uses explicit initial vowels (اَ اِ), rounded jazm (ۡ instead of ْ), superscript alef on Allah (لِلّٰهِ) and verse-end marks (ۙؕ). E.g. 1:2 — اَلۡحَمۡدُ لِلّٰهِ رَبِّ الۡعٰلَمِیۡنَۙ. The ۡ shape is correct IndoPak jazm, not a mistake.",
+    fontFamily: "'Gulzar', 'Noto Nastaliq Urdu', 'Lateef', 'Amiri', serif",
+    fontClass: "font-script-indopak",
+    quranComEndpoint: "indopak",
+    fallbackEdition: "quran-uthmani",
+    sourceName: "quran.com indopak",
   },
   {
     id: "plain",
-    label: "No diacritics or symbols",
-    description: "Plain Arabic, no vowels or pause marks",
-    endpoint: "uthmani_simple",
-    field: "text_uthmani_simple",
-    fontClass: "font-scheherazade",
-    themeClass: "quran-theme-plain",
-    bismillah: "بسم الله الرحمن الرحيم",
+    label: "Plain (No diacritics / symbols)",
+    arabicLabel: "بدون تشكيل",
+    desc: "Letters only — no tashkeel, no waqf symbols. Beginners.",
+    longDesc:
+      "Bare letters derived from the verified text (quran.com uthmani_simple). No harakat, no waqf marks. Example 1:2 — الحمد لله رب العلمين. Best for letter-recognition practice.",
+    fontFamily: "'Noto Naskh Arabic', 'Amiri', serif",
+    fontClass: "font-script-plain",
+    quranComEndpoint: "uthmani_simple",
+    fallbackEdition: "quran-simple-clean",
+    sourceName: "quran.com uthmani_simple → AlQuran Cloud quran-simple-clean",
   },
-] as const;
+];
 
-export type QuranScriptId = (typeof QURAN_SCRIPTS)[number]["id"];
-
-export function resolveQuranScript(value: string | null | undefined) {
-  return QURAN_SCRIPTS.find((script) => script.id === value) ?? QURAN_SCRIPTS[0];
+export function getScriptOption(id: string): QuranScriptOption {
+  return QURAN_SCRIPTS.find((s) => s.id === id) ?? QURAN_SCRIPTS[0];
 }
 
-export function getScriptOption(id: string | null | undefined) {
-  const script = resolveQuranScript(id);
-  const endpoint =
-    script.id === "uthmani"
-      ? "uthmani"
-      : script.id === "indopak"
-        ? "indopak"
-        : script.id === "plain"
-          ? "uthmani_simple"
-          : "imlaei";
-  return {
-    ...script,
-    quranComEndpoint: endpoint,
-  };
+const VALID_SCRIPT_IDS: readonly string[] = ["standard", "uthmani", "mushaf", "indopak", "plain"];
+
+export function isQuranScriptId(v: unknown): v is QuranScriptId {
+  return typeof v === "string" && VALID_SCRIPT_IDS.includes(v.trim().toLowerCase());
 }
 
+/** Remove invisible formatting / private-use chars from quran.com texts. */
 export function cleanScriptText(text: string): string {
-  return (text || "").replace(/[\u200e\u200f\u200b\ufeff]/g, "").replace(/\s+/g, " ").trim();
+  if (!text) return text;
+  return (
+    text
+      // directional formatting + zero-width chars (incl. ZWSP/ZWNJ/ZWJ/word joiner)
+      .replace(/[‎‏‪‫‬‭‮⁠⁡⁢⁣⁤﻿￹￺​‌‍⁠]/g, "")
+      // private-use area (ayah ornaments embedded in indopak text)
+      .replace(/[-]/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+  );
 }
 
-export function stripToPlainLetters(text: string): string {
+/** True if the token contains at least one Arabic letter (not just a waqf symbol). */
+export function isArabicWordToken(token: string): boolean {
+  return /[ء-غف-يٱڪگچپڤەۏ]/.test(token);
+}
+
+/** Split cleaned Arabic into word tokens, dropping standalone waqf symbols. */
+export function splitArabicWords(text: string): string[] {
   return cleanScriptText(text)
-    .replace(/[\u064b-\u065f\u0670\u06d6-\u06ed\u0640]/g, "")
+    .split(/\s+/)
+    .filter((w) => w && isArabicWordToken(w));
+}
+
+/**
+ * Extra cleaning for the "Plain" script: strip ALL tashkeel, superscript
+ * marks, tatweel and waqf/ornament symbols, leaving letters only.
+ * Also normalises wasla-alif and hamza variants to plain alif.
+ */
+export function stripToPlainLetters(text: string): string {
+  if (!text) return text;
+  let t = cleanScriptText(text);
+  t = t
+    // harakat + superscript alef/small marks + shadda/sukun etc.
+    .replace(/[ً-ٰٟـ]/g, "")
+    // maddah over alef etc. leftovers + superscript seen/meem variants
+    .replace(/[ٰٖٜٟٗ٘ٙٚٛٝٞ]/g, "")
+    // waqf + sajdah + rub + ornamental marks
+    .replace(/[ۖۗۘۙۚۛۜ۝۞ۣ۟۠ۡۢۤۥۦؕؔ]/g, "")
+    // normalise alef variants to plain alef
     .replace(/[ٱأإآ]/g, "ا")
     .replace(/\s+/g, " ")
     .trim();
+  return t;
 }
 
-export function normalizePrintedQuran(text: string): string {
-  return text
-    .replace(/\u06e1/g, "\u0652")
-    .replace(/[\u200e\u200f\u200b\ufeff]/g, "")
-    .replace(/([\u064b-\u0650])\u0651/g, "\u0651$1")
-    .replace(/\u00a0/g, " ")
-    .trim();
-}
+/** localStorage key for the reader script preference. */
+export const SCRIPT_STORAGE_KEY = "noor-quran-script";
 
-export function cleanVerseText(text: string, scriptId: QuranScriptId): string {
-  let cleaned = text.replace(/^\uFEFF/, "").replace(/\u00a0/g, " ").trim();
-  if (scriptId === "standard") {
-    cleaned = normalizePrintedQuran(cleaned);
+export function readStoredScript(): QuranScriptId {
+  if (typeof window === "undefined") return DEFAULT_QURAN_SCRIPT;
+  try {
+    const v = window.localStorage.getItem(SCRIPT_STORAGE_KEY);
+    if (isQuranScriptId(v)) return v as QuranScriptId;
+  } catch {
+    // ignore
   }
-  if (scriptId === "mushaf") {
-    cleaned = cleaned.replace(/[\s\u200b\u200f]*[\u0660-\u0669\u06f0-\u06f9\d]+$/u, "").trim();
-  }
-  return cleaned;
+  return DEFAULT_QURAN_SCRIPT;
 }
 
+export function storeScript(id: QuranScriptId) {
+  try {
+    window.localStorage.setItem(SCRIPT_STORAGE_KEY, id);
+  } catch {
+    // ignore
+  }
+}
+
+/** Remove any HTML tags from a verse string (tajweed spans, etc.). */
 export function stripHtml(text: string): string {
-  return text
-    .replace(/<sup\b[^>]*>[\s\S]*?<\/sup>/gi, "")
-    .replace(/<[^>]*>/g, "")
-    .replace(/&quot;/g, "\"")
-    .replace(/&#39;/g, "'")
-    .replace(/&amp;/g, "&")
-    .replace(/&nbsp;/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  if (!text) return text;
+  return String(text).replace(/<[^>]*>/g, "").trim();
+}
+
+/**
+ * Full verse cleaner: strips HTML, then invisible formatting /
+ * private-use chars. Safe to call on any API text.
+ */
+export function cleanVerseText(text: string): string {
+  if (!text) return text;
+  return cleanScriptText(stripHtml(String(text)));
+}
+
+/**
+ * Resolve a user-supplied script value to a valid QuranScriptId,
+ * falling back to the default (standard) for anything unknown.
+ * Accepts legacy values too: "mushaf" maps to the Madinah print text.
+ */
+export function resolveQuranScript(v: unknown): QuranScriptId {
+  if (typeof v === "string") {
+    const s = v.trim().toLowerCase();
+    if (isQuranScriptId(s)) return s as QuranScriptId;
+  }
+  if (typeof window !== "undefined") {
+    try {
+      const stored = window.localStorage.getItem(SCRIPT_STORAGE_KEY);
+      if (isQuranScriptId(stored)) return stored as QuranScriptId;
+    } catch {
+      // ignore
+    }
+  }
+  return DEFAULT_QURAN_SCRIPT;
 }

@@ -84,7 +84,7 @@ export function CertificateModal({
                 بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
               </p>
               <p className="text-[11px] uppercase tracking-widest text-emerald-400 font-semibold">
-                NOOR QURAN BY NAJANS • CERTIFICATE OF ACHIEVEMENT
+                NOOR QURAN BY NAJANS ACADEMY • CERTIFICATE OF ACHIEVEMENT
               </p>
             </div>
 
@@ -138,7 +138,7 @@ export function CertificateModal({
               <div className="text-right space-y-1">
                 <div className="text-xs font-semibold text-slate-200">{currentDate}</div>
                 <div className="text-[10px] text-slate-400 border-t border-slate-700 pt-1">
-                  Noor Quran by NajAns
+                  Noor Quran by NajAns Academic Board
                 </div>
               </div>
             </div>
