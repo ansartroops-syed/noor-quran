@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { currentPrivateUser } from "@/lib/auth";
 import { MATHS_QUIZ_LEVELS } from "@/data/private/mathsQuiz";
 import { ENGLISH_QUIZ_LEVELS } from "@/data/private/englishQuiz";
 import { GK_QUIZ_LEVELS } from "@/data/private/gkQuiz";
@@ -11,10 +10,6 @@ const QUIZZES = {
 };
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ subject: string }> }) {
-  const user = await currentPrivateUser();
-  if (!user) {
-    return NextResponse.json({ success: false, error: "Sign in required." }, { status: 401 });
-  }
   const { subject } = await params;
   const levels = QUIZZES[subject as keyof typeof QUIZZES];
   if (!levels) {

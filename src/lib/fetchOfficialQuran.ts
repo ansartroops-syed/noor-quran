@@ -1,37 +1,21 @@
 import { SURAH_LIST } from "@/data/surahMetadata";
-
-// SELF-CONTAINED: no imports from "@/lib/quranScripts" on purpose.
-// Vercel was building an old quranScripts.ts without the new exports,
-// which broke the build. Everything needed lives in this file.
-
-type LocalScriptId = "standard" | "uthmani" | "mushaf" | "indopak" | "plain";
-
-function resolveQuranScript(v: unknown): LocalScriptId {
-  if (typeof v === "string") {
-    const s = v.trim().toLowerCase();
-    if (s === "standard" || s === "uthmani" || s === "mushaf" || s === "indopak" || s === "plain") {
-      return s as LocalScriptId;
-    }
-  }
-  return "standard";
-}
+import {
+  cleanScriptText,
+  cleanVerseText,
+  getScriptOption,
+  stripToPlainLetters,
+  type QuranScriptId,
+} from "@/lib/quranScripts";
 
 function stripHtml(text: string): string {
-  return String(text ?? "")
+  return text
+    .replace(/<sup\b[^>]*>[\s\S]*?<\/sup>/gi, "")
     .replace(/<[^>]*>/g, "")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
-    .trim();
-}
-
-function cleanVerseText(text: string): string {
-  if (!text) return text;
-  return String(text)
-    .replace(/[‎‏‪‫‬‭‮⁠⁡⁢⁣⁤﻿￹￺​‌‍⁠]/g, "")
-    .replace(/[-]/g, "")
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "")
+    .replace(/&nbsp;/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -39,118 +23,108 @@ function cleanVerseText(text: string): string {
 export interface OfficialAyah {
   number: number;
   arabic: string;
-  transliteration: string;
   translation: string;
+  transliteration: string;
 }
 
-export interface OfficialSurah {
-  surahNumber: number;
-  surahName: string;
-  ayahs: OfficialAyah[];
-  source: string;
+export interface OfficialSurahText {
+  number: number;
+  nameArabic: string;
+  nameTransliterated: string;
+  nameEnglish: string;
+  versesCount: number;
+  revelationType: "Meccan" | "Medinan";
+  juzNumber: number;
   script: string;
+  bismillah: string | null;
+  ayahs: OfficialAyah[];
 }
 
-function orderVerseKeys(a: { verse_key: string }, b: { verse_key: string }): number {
-  return a.verse_key.localeCompare(b.verse_key, undefined, { numeric: true });
-}
+const TEXT_FIELD: Record<string, string> = {
+  imlaei: "text_imlaei",
+  uthmani: "text_uthmani",
+  indopak: "text_indopak",
+  uthmani_simple: "text_uthmani_simple",
+  qpc_hafs: "text_uthmani",
+};
 
-async function fetchQuranComTexts(
-  surahNum: number,
-  scriptId: string
-): Promise<{ texts: string[]; source: string } | null> {
-  const endpoint =
-    scriptId === "uthmani" || scriptId === "mushaf"
-      ? "uthmani"
-      : scriptId === "indopak"
-        ? "indopak"
-        : scriptId === "plain"
-          ? "uthmani_simple"
-          : "imlaei";
-  const textKey =
-    endpoint === "uthmani"
-      ? "text_uthmani"
-      : endpoint === "indopak"
-        ? "text_indopak"
-        : endpoint === "imlaei"
-          ? "text_imlaei"
-          : "text_uthmani_simple";
-  try {
-    const res = await fetch(
-      `https://api.quran.com/api/v4/quran/verses/${endpoint}?chapter_number=${surahNum}`,
-      {
-        headers: { "User-Agent": "NoorQuranByNajAns/1.0 (Quran reader)" },
-      }
-    );
-    if (!res.ok) return null;
-    const json = await res.json();
-    const verses = json?.verses;
-    if (!Array.isArray(verses) || verses.length === 0) return null;
-    verses.sort(orderVerseKeys);
-    const texts = verses.map((v: Record<string, unknown>) =>
-      cleanVerseText(stripHtml(String(v[textKey] ?? "")))
-    );
-    if (texts.some((t) => !t)) return null;
-    return { texts, source: `quran.com:${endpoint}` };
-  } catch (err) {
-    console.warn(`fetchOfficialQuran quran.com ${endpoint} failed:`, err);
-    return null;
+async function readJson(url: string) {
+  const response = await fetch(url, {
+    headers: {
+      Accept: "application/json",
+      "User-Agent": "NoorQuranByNajAns/1.0 (Quran reader)",
+    },
+    next: { revalidate: 86400 },
+  });
+  if (!response.ok) {
+    throw new Error(`Quran text request failed (${response.status})`);
   }
-}
-
-async function fetchTranslations(
-  surahNum: number
-): Promise<{ translations: string[]; transliterations: string[] }> {
-  try {
-    const res = await fetch(
-      `https://api.alquran.cloud/v1/surah/${surahNum}/editions/quran-uthmani,en.sahih,en.transliteration`
-    );
-    if (!res.ok) return { translations: [], transliterations: [] };
-    const json = await res.json();
-    if (json.code !== 200 || !Array.isArray(json.data) || json.data.length < 2) {
-      return { translations: [], transliterations: [] };
-    }
-    return {
-      translations: json.data[1].ayahs.map((a: { text: string }) => stripHtml(a.text)),
-      transliterations: (json.data[2] || json.data[1]).ayahs.map((a: { text: string }) =>
-        stripHtml(a.text)
-      ),
-    };
-  } catch {
-    return { translations: [], transliterations: [] };
-  }
+  return response.json();
 }
 
 export async function fetchOfficialSurah(
-  surahNum: number,
-  scriptParam?: string | null
-): Promise<OfficialSurah> {
-  const script = resolveQuranScript(scriptParam ?? null);
-  const meta = SURAH_LIST.find((s) => s.number === surahNum);
-  const surahName = meta?.nameTransliterated || `Surah ${surahNum}`;
-
-  const arabic = await fetchQuranComTexts(surahNum, script);
-  const tr = await fetchTranslations(surahNum);
-
-  const count = arabic?.texts.length || meta?.versesCount || 0;
-  const ayahs: OfficialAyah[] = [];
-  for (let i = 0; i < count; i++) {
-    ayahs.push({
-      number: i + 1,
-      arabic: arabic?.texts[i] ?? "",
-      transliteration: tr.transliterations[i] ?? "",
-      translation: tr.translations[i] ?? "",
-    });
+  surahNumber: number,
+  requestedScript?: string | null
+): Promise<OfficialSurahText> {
+  const meta = SURAH_LIST.find((surah) => surah.number === surahNumber);
+  if (!meta) {
+    throw new Error("Choose a surah from 1 to 114.");
   }
 
+  const script = getScriptOption(requestedScript || "standard");
+  const endpoint = script.endpoint === "qpc_hafs" || script.endpoint === "standard" ? "imlaei" : script.endpoint;
+  const field = TEXT_FIELD[endpoint] || "text_imlaei";
+
+  const [arabicJson, translationJson, transliterationJson] = await Promise.all([
+    readJson(`https://api.quran.com/api/v4/quran/verses/${endpoint}?chapter_number=${surahNumber}`),
+    readJson(`https://api.quran.com/api/v4/quran/translations/20?chapter_number=${surahNumber}`),
+    readJson(`https://api.quran.com/api/v4/quran/translations/57?chapter_number=${surahNumber}`),
+  ]);
+
+  const arabicVerses = Array.isArray(arabicJson.verses) ? arabicJson.verses : [];
+  const translations = Array.isArray(translationJson.translations) ? translationJson.translations : [];
+  const transliterations = Array.isArray(transliterationJson.translations) ? transliterationJson.translations : [];
+
+  if (arabicVerses.length !== meta.versesCount) {
+    throw new Error("The official verse count did not match, so this surah was not shown.");
+  }
+
+  const scriptId = script.id as QuranScriptId;
+
+  const ayahs: OfficialAyah[] = arabicVerses.map(
+    (verse: { verse_key?: string; [key: string]: unknown }, index: number) => {
+      const expectedKey = `${surahNumber}:${index + 1}`;
+      if (verse.verse_key && verse.verse_key !== expectedKey) {
+        throw new Error("The official verse order did not match, so this surah was not shown.");
+      }
+
+      let arabic = cleanScriptText(String(verse[field] || ""));
+      if (scriptId === "plain") arabic = stripToPlainLetters(arabic);
+      arabic = cleanVerseText(arabic, scriptId);
+
+      if (!arabic) {
+        throw new Error("An official Arabic verse was missing, so this surah was not shown.");
+      }
+
+      return {
+        number: index + 1,
+        arabic,
+        translation: stripHtml(String(translations[index]?.text || "")),
+        transliteration: stripHtml(String(transliterations[index]?.text || "")),
+      };
+    }
+  );
+
   return {
-    surahNumber: surahNum,
-    surahName,
+    number: meta.number,
+    nameArabic: meta.nameArabic,
+    nameTransliterated: meta.nameTransliterated,
+    nameEnglish: meta.nameEnglish,
+    versesCount: meta.versesCount,
+    revelationType: meta.revelationType,
+    juzNumber: meta.juzNumber,
+    script: script.id,
+    bismillah: meta.number === 9 ? null : script.bismillah,
     ayahs,
-    source: arabic?.source ?? "unavailable",
-    script,
   };
 }
-
-// Re-exported for any other file that imports them from here.
-export { resolveQuranScript, cleanVerseText, stripHtml };
